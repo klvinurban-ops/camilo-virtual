@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camilo Virtual · Corbeta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A2239; --navy2:#123A5F; --blue:#2563EB;
+  --amber:#FFC42E; --amber-d:#E8A400;
+  --paper:#F2F5F8; --card:#FFFFFF; --ink:#14232F; --muted:#51616E;
+  --line:#D5DEE7; --ok:#12B76A; --err:#E5484D; --r:1rem;
+}
+html{font-size:19px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Instrument Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif}
+
+header{position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;
+  background-image:radial-gradient(rgba(255,196,46,.14) 1px,transparent 1px);
+  background-size:18px 18px;box-shadow:0 4px 20px rgba(10,34,57,.25)}
+.h-in{max-width:46rem;margin:auto;display:flex;align-items:center;gap:.8rem;padding:.8rem 1rem}
+.avatar{width:2.8rem;height:2.8rem;border-radius:50%;background:var(--amber);display:grid;place-items:center;font-size:1.4rem;position:relative;flex-shrink:0}
+.avatar::after{content:'';position:absolute;inset:-.3rem;border-radius:50%;border:2px solid var(--amber);opacity:.6;animation:pulse 2s infinite}
+@keyframes pulse{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+.h-name{font-weight:800;font-size:1.15rem;line-height:1.2}
+.h-status{font-size:.74rem;color:#BFD3E6;display:flex;align-items:center;gap:.35rem;margin-top:.15rem}
+.dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--amber);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.ticker{background:var(--amber);overflow:hidden;white-space:nowrap;font-weight:700;font-size:.78rem;color:var(--navy)}
+.ticker span{display:inline-block;padding:.5rem 0;animation:slide 35s linear infinite}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+main{max-width:46rem;margin:auto;padding:1.3rem 1rem 7.5rem}
+.view{display:none;animation:fadeUp .4s ease both}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.bubble{background:var(--card);border:1px solid var(--line);border-left:.35rem solid var(--amber);
+  border-radius:var(--r);padding:1.2rem 1.3rem;box-shadow:0 6px 18px rgba(10,34,57,.06);margin-bottom:1.3rem}
+.bubble p{font-size:1.02rem;line-height:1.6}
+.typing{display:inline-flex;gap:4px;align-items:center;height:1.3rem}
+.typing i{width:.45rem;height:.45rem;border-radius:50%;background:var(--muted);animation:tp 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-4px);opacity:1}}
+
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:1rem 0 .5rem;margin-bottom:.5rem}
+.hero-ico{font-size:3rem;margin-bottom:.5rem;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero h2{font-size:1.4rem;font-weight:800;color:var(--navy);margin-bottom:.3rem}
+.hero p{color:var(--muted);font-size:.92rem;max-width:24rem}
+
+.options{display:grid;gap:1rem}
+.opt{position:relative;background:var(--card);border:2px solid var(--line);border-radius:var(--r);
+  padding:1.5rem 1.3rem;cursor:pointer;text-align:left;transition:.25s;overflow:hidden;display:flex;align-items:center;gap:1rem}
+.opt:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(10,34,57,.12);border-color:var(--navy)}
+.opt:active{transform:translateY(-1px)}
+.opt::before{content:'';position:absolute;top:0;left:0;right:0;height:.35rem}
+.opt.cot::before{background:var(--amber)} .opt.gar::before{background:var(--blue)}
+.opt .ico{font-size:2.6rem;flex-shrink:0}
+.opt h3{font-size:1.35rem;font-weight:800;margin-bottom:.2rem;color:var(--navy)}
+.opt p{font-size:.92rem;color:var(--muted);line-height:1.45}
+.opt .go{margin-left:auto;font-size:1.8rem;color:var(--muted);transition:transform .2s}
+.opt:hover .go{transform:translateX(4px);color:var(--navy)}
+
+.call-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1.1rem;
+  background:var(--ok);color:#fff;border:none;border-radius:var(--r);min-height:3.5rem;
+  width:100%;font-family:inherit;font-size:1.1rem;font-weight:800;cursor:pointer;text-decoration:none;
+  box-shadow:0 4px 14px rgba(18,183,106,.3);transition:.2s}
+.call-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(18,183,106,.4)}
+.call-btn:active{transform:translateY(0)}
+
+.cat-grid{display:grid;gap:.85rem}
+.cat{display:flex;align-items:center;gap:1rem;background:var(--card);border:2px solid var(--line);
+  border-radius:var(--r);padding:1.2rem 1.1rem;cursor:pointer;transition:.2s;text-align:left;font-family:inherit;width:100%}
+.cat:hover{border-color:var(--navy);transform:translateY(-2px);box-shadow:0 8px 18px rgba(10,34,57,.08)}
+.cat:active{transform:translateY(0)}
+.cat .c-ico{font-size:2.4rem;flex-shrink:0}
+.cat h3{font-size:1.15rem;font-weight:800;color:var(--navy)}
+.cat p{font-size:.84rem;color:var(--muted);margin-top:.15rem}
+.cat .soon{margin-left:auto;background:var(--paper);border:1.5px solid var(--line);color:var(--muted);
+  font-size:.72rem;font-weight:800;padding:.3rem .7rem;border-radius:99px;white-space:nowrap}
+.cat .open{margin-left:auto;color:var(--amber-d);font-size:1.6rem;transition:transform .2s}
+.cat:hover .open{transform:translateX(3px)}
+
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0 1.2rem}
+.chip{padding:.65rem 1.2rem;border-radius:99px;border:2px solid var(--line);background:var(--card);
+  font-family:inherit;font-size:.95rem;font-weight:800;cursor:pointer;color:var(--ink);transition:.2s}
+.chip:hover{border-color:var(--navy);color:var(--navy)}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+.prod-grid{display:grid;gap:1rem}
+@media(min-width:40rem){.prod-grid{grid-template-columns:1fr 1fr}}
+.prod{background:var(--card);border:2px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.25s}
+.prod:hover{border-color:var(--navy);box-shadow:0 10px 24px rgba(10,34,57,.1)}
+.prod-img{height:14rem;position:relative;background:#fff;border-bottom:1px solid var(--line)}
+.ph{width:100%;height:100%;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--navy),var(--navy2));text-align:center}
+.ph b{font-size:1rem;letter-spacing:.1em;text-transform:uppercase}
+.ph.mini{background:linear-gradient(120deg,#38bdf8,#e879f9 35%,#fb7185 62%,#fbbf24)}
+.ph.mini b{font-size:1.7rem;letter-spacing:.02em;text-transform:none;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.brand{position:absolute;top:.6rem;left:.6rem;background:var(--amber);color:var(--navy);
+  font-size:.75rem;font-weight:800;padding:.3rem .7rem;border-radius:.5rem;z-index:2;
+  box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.prod-body{padding:1.1rem;display:flex;flex-direction:column;gap:.55rem;flex:1}
+.prod-body h4{font-size:1.08rem;font-weight:800;line-height:1.3;color:var(--navy)}
+.prod-body .desc{font-size:.9rem;color:var(--muted);line-height:1.45;flex:1}
+.specs{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.2rem}
+.specs span{background:var(--paper);border:1px solid var(--line);border-radius:99px;
+  font-size:.72rem;font-weight:700;padding:.25rem .65rem;color:var(--muted)}
+.ean{background:var(--paper);border:1.5px dashed var(--line);padding:.55rem .75rem;border-radius:.6rem;font-size:.88rem;margin-top:.2rem}
+.ean b{font-family:monospace;font-size:1rem;letter-spacing:.05em;word-break:break-all}
+
+.img-wrap{position:relative;height:100%;width:100%}
+.img-main{width:100%;height:100%;object-fit:contain;display:block;padding:.5rem}
+.img-wrap .ph{position:absolute;inset:0}
+.img-thumb{position:absolute;bottom:.6rem;left:.6rem;width:3.8rem;height:3.8rem;object-fit:cover;
+  border:2px solid var(--amber);border-radius:.5rem;cursor:pointer;background:#fff;
+  box-shadow:0 3px 10px rgba(0,0,0,.18);transition:transform .2s;z-index:2}
+.img-thumb:hover{transform:scale(1.1)}
+.img-thumb:active{transform:scale(1)}
+
+.fab{position:fixed;right:1rem;bottom:1rem;z-index:90;display:flex;align-items:center;gap:.5rem;
+ background:var(--amber);color:var(--navy);border:none;border-radius:99px;min-height:3.5rem;
+ padding:0 1.3rem;font-family:inherit;font-size:1.05rem;font-weight:800;cursor:pointer;
+ box-shadow:0 10px 24px rgba(10,34,57,.35);transition:.2s}
+.fab:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(10,34,57,.4)}
+.fab:active{transform:scale(.96)}
+.fab .cnt{background:var(--navy);color:var(--amber);border-radius:99px;min-width:1.6rem;height:1.6rem;
+ display:grid;place-items:center;font-size:.9rem}
+.fab.bump{animation:bump .4s ease}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+.fab-home{position:fixed;right:1rem;bottom:5.2rem;z-index:90;display:flex;align-items:center;gap:.5rem;
+ background:var(--navy);color:#fff;border:none;border-radius:99px;min-height:3.2rem;
+ padding:0 1.2rem;font-family:inherit;font-size:.95rem;font-weight:800;cursor:pointer;
+ box-shadow:0 8px 20px rgba(10,34,57,.3);transition:.2s}
+.fab-home:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(10,34,57,.4)}
+.fab-home:active{transform:scale(.96)}
+
+.toast{position:fixed;left:50%;bottom:9.5rem;transform:translateX(-50%) translateY(20px);z-index:95;
+ background:var(--navy);color:#fff;padding:.85rem 1.3rem;border-radius:.8rem;font-weight:700;
+ font-size:.95rem;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 10px 24px rgba(0,0,0,.3);
+ text-align:center;max-width:90%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.cart-item{display:flex;gap:.85rem;align-items:center;background:var(--card);border:2px solid var(--line);
+ border-radius:var(--r);padding:.9rem;margin-bottom:.85rem}
+.cart-item img{width:4.5rem;height:4.5rem;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:.6rem;flex-shrink:0}
+.ci-body{flex:1;min-width:0}
+.ci-body h4{font-size:.98rem;font-weight:800;line-height:1.25;color:var(--navy)}
+.ci-body .ci-ean{font-size:.78rem;color:var(--muted);font-family:monospace;margin-top:.15rem}
+.qty{display:flex;align-items:center;gap:.5rem;margin-top:.45rem}
+.q-btn{width:2.4rem;height:2.4rem;border-radius:.6rem;border:2px solid var(--line);background:var(--paper);
+ font-family:inherit;font-size:1.2rem;font-weight:800;cursor:pointer;color:var(--navy);transition:.15s}
+.q-btn:hover{background:var(--line)}
+.q-btn:active{transform:scale(.92)}
+.q-val{min-width:1.8rem;text-align:center;font-weight:800;font-size:1.1rem}
+.ci-x{background:none;border:none;color:var(--err);font-size:1.2rem;font-weight:800;cursor:pointer;min-width:2.4rem;min-height:2.4rem;border-radius:.5rem;transition:.15s}
+.ci-x:hover{background:rgba(229,72,77,.1)}
+
+.btn{display:block;width:100%;min-height:3.3rem;padding:.6rem 1rem;border:none;border-radius:.8rem;
+  font-family:inherit;font-size:1.05rem;font-weight:800;cursor:pointer;transition:.2s;margin-top:.6rem}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy2)}
+.btn-amber{background:var(--amber);color:var(--navy)}
+.btn-amber:hover{background:var(--amber-d)}
+.btn-ghost{background:transparent;border:2px solid var(--line);color:var(--muted);margin-top:.6rem}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy)}
+.back{background:none;border:none;color:var(--muted);font-size:.98rem;font-weight:700;cursor:pointer;
+  font-family:inherit;display:inline-flex;gap:.4rem;align-items:center;margin-bottom:1rem;min-height:2.5rem;transition:.15s;padding:.3rem .5rem;border-radius:.5rem}
+.back:hover{color:var(--ink);background:var(--card)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1.4rem 1.2rem;box-shadow:0 6px 18px rgba(10,34,57,.06)}
+label{display:block;font-size:.92rem;font-weight:800;margin:1rem 0 .35rem;color:var(--navy)}
+label small{font-weight:400;color:var(--muted)}
+input,select,textarea{width:100%;padding:.85rem .9rem;border:2px solid var(--line);border-radius:.7rem;
+  font-family:inherit;font-size:1.05rem;background:#FBFCFD;transition:.2s;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff}
+.bad{border-color:var(--err)!important}
+.err-msg{color:var(--err);font-size:.8rem;margin-top:.2rem;display:none;font-weight:700}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:30rem){.row2{grid-template-columns:1fr}}
+
+.wiz-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem}
+.wiz-head h2{font-size:1.3rem;font-weight:800;color:var(--navy)}
+.step-tag{margin-left:auto;font-size:.78rem;font-weight:800;color:var(--blue);background:rgba(37,99,235,.1);padding:.35rem .7rem;border-radius:99px}
+.progress{height:.45rem;background:var(--line);border-radius:99px;margin-bottom:1.2rem;overflow:hidden}
+.progress .bar{height:100%;width:20%;background:linear-gradient(90deg,var(--blue),var(--navy));border-radius:99px;transition:width .4s ease}
+.step{display:none}
+.step.active{display:block;animation:fadeUp .35s ease both}
+
+.tipo-grid{display:grid;gap:.8rem;margin-top:.5rem}
+.tipo-card{border:2px solid var(--line);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:.2s;display:flex;gap:.9rem;align-items:flex-start}
+.tipo-card:hover{border-color:var(--blue);background:rgba(37,99,235,.02)}
+.tipo-card.sel{border-color:var(--blue);background:rgba(37,99,235,.05)}
+.tipo-card .t-ico{font-size:1.8rem}
+.tipo-card h4{font-size:1.1rem;font-weight:800;color:var(--navy)}
+.tipo-card p{font-size:.88rem;color:var(--muted);margin-top:.2rem;line-height:1.4}
+
+.upload-grid{display:grid;gap:.8rem;margin-top:.5rem}
+.upload{border:2px dashed var(--line);border-radius:var(--r);padding:1.1rem;cursor:pointer;transition:.2s;text-align:center;position:relative}
+.upload:hover{border-color:var(--blue);background:rgba(37,99,235,.02)}
+.upload .u-ico{font-size:1.8rem}
+.upload h4{font-size:1rem;font-weight:800;margin:.4rem 0 .15rem;color:var(--navy)}
+.upload p{font-size:.82rem;color:var(--muted)}
+.upload.done{border-style:solid;border-color:var(--ok);background:rgba(18,183,106,.06)}
+.upload .badge-ok{position:absolute;top:.6rem;right:.6rem;background:var(--ok);color:#fff;font-size:.72rem;font-weight:800;padding:.2rem .55rem;border-radius:99px}
+.preview{max-width:100%;max-height:8rem;border-radius:.5rem;margin-top:.6rem;display:none}
+.dur-badge{display:inline-block;margin-top:.5rem;font-size:.8rem;font-weight:800;padding:.25rem .7rem;border-radius:99px;background:rgba(18,183,106,.12);color:var(--ok)}
+
+.sum{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:.95rem;margin-top:.5rem}
+.sum-h{background:var(--navy);color:#fff;padding:.6rem .9rem;font-weight:800;font-size:.85rem;letter-spacing:.5px;text-transform:uppercase}
+.sum-r{display:flex;padding:.6rem .9rem;border-bottom:1px solid var(--line)}
+.sum-r:last-child{border:none}
+.sum-r b{width:42%;color:var(--muted);font-weight:600}
+.sum-r span{width:58%;word-break:break-word}
+
+.success{text-align:center;padding:2rem .5rem}
+.check{width:4.8rem;height:4.8rem;border-radius:50%;background:var(--ok);color:#fff;font-size:2.3rem;
+  display:grid;place-items:center;margin:0 auto 1rem;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;
+  box-shadow:0 6px 18px rgba(18,183,106,.35)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.case-code{font-family:'Bricolage Grotesque';font-size:1.75rem;font-weight:800;color:var(--navy);
+  background:rgba(255,196,46,.25);display:inline-block;padding:.5rem 1.2rem;border-radius:.7rem;margin:.6rem 0;letter-spacing:1px}
+.debug{font-size:.75rem;color:var(--muted);text-align:center;margin-top:.5rem;font-family:monospace}
+
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+.empty-ico{font-size:3rem;margin-bottom:.8rem;opacity:.5}
+.empty h3{font-size:1.1rem;font-weight:800;color:var(--navy);margin-bottom:.3rem}
+.empty p{font-size:.9rem;line-height:1.5}
+
+footer{text-align:center;padding:2rem 1rem 1.5rem;font-size:.78rem;color:var(--muted);line-height:1.6}
+footer b{color:var(--navy)}
+footer .footer-brand{font-weight:800;color:var(--navy);font-size:.88rem;margin-bottom:.3rem;display:block}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-in">
+    <div class="avatar">🤖</div>
+    <div>
+      <div class="h-name">Camilo Virtual</div>
+      <div class="h-status"><span class="dot"></span> En ruta · Norte y Occidente</div>
+    </div>
+  </div>
+</header>
+<div class="ticker"><span>📺 TELEVISORES Samsung · TCL · Kalley · LG &nbsp;&nbsp;•&nbsp;&nbsp; 🧊 NEVERAS &nbsp;&nbsp;•&nbsp;&nbsp; ❄️ NEVECONES &nbsp;&nbsp;•&nbsp;&nbsp; 🧺 LAVADORAS Kalley · Electrolux &nbsp;&nbsp;•&nbsp;&nbsp; 🌀 VENTILADORES &nbsp;&nbsp;•&nbsp;&nbsp; 💅 BELLEZA &nbsp;&nbsp;•&nbsp;&nbsp; 📱 TECNOLOGÍA &nbsp;&nbsp;•&nbsp;&nbsp; 🚚 Rutas Norte y Occidente · Corbeta &nbsp;&nbsp;•&nbsp;&nbsp; 📺 TELEVISORES Samsung · TCL · Kalley · LG &nbsp;&nbsp;•&nbsp;&nbsp; 🧊 NEVERAS &nbsp;&nbsp;•&nbsp;&nbsp; ❄️ NEVECONES &nbsp;&nbsp;•&nbsp;&nbsp; 🧺 LAVADORAS Kalley · Electrolux &nbsp;&nbsp;•&nbsp;&nbsp; 🌀 VENTILADORES &nbsp;&nbsp;•&nbsp;&nbsp; 💅 BELLEZA &nbsp;&nbsp;•&nbsp;&nbsp; 📱 TECNOLOGÍA &nbsp;&nbsp;•&nbsp;&nbsp; 🚚 Rutas Norte y Occidente · Corbeta &nbsp;&nbsp;•&nbsp;&nbsp;</span></div>
+
+<main>
+
+<section class="view active" id="v-home">
+  <div class="bubble">
+    <span class="typing" id="typing"><i></i><i></i><i></i></span>
+    <p id="botMsg" style="display:none">¡Hola! 👋 Soy <b>Camilo Virtual</b>, la mano derecha de Camilo. Te ayudo con el <b>portafolio</b>, a armar tu <b>pedido</b> o a reportar <b>garantías</b>. ¿Por dónde empezamos?</p>
+  </div>
+
+  <div class="hero">
+    <div class="hero-ico">🛍️</div>
+    <h2>Tu asistente de ruta</h2>
+    <p>Televisores, neveras, nevecones, lavadoras y más del portafolio Corbeta, siempre disponible.</p>
+  </div>
+
+  <div class="options">
+    <div class="opt cot" onclick="go('v-port')">
+      <span class="ico">🛒</span>
+      <div><h3>Portafolio</h3><p>Televisores, neveras, nevecones, lavadoras y más.</p></div>
+      <span class="go">›</span>
+    </div>
+    <div class="opt gar" onclick="go('v-gar'); startGarantias()">
+      <span class="ico">🛡️</span>
+      <div><h3>Garantías</h3><p>Reporta una novedad con fotos y video.</p></div>
+      <span class="go">›</span>
+    </div>
+  </div>
+
+  <a class="call-btn" href="tel:+573164479695">📞 Llamar a Camilo</a>
+</section>
+
+<section class="view" id="v-port">
+  <button class="back" onclick="go('v-home')">← Volver al inicio</button>
+  <h2 style="font-size:1.4rem;margin-bottom:.3rem;color:var(--navy)">🛒 Nuestro Portafolio</h2>
+  <p style="font-size:.9rem;color:var(--muted);margin-bottom:1rem">Elige una categoría para explorar.</p>
+  <div class="cat-grid">
+    <button class="cat" onclick="abrirCat('televisores')">
+      <span class="c-ico">📺</span>
+      <div><h3>Televisores</h3><p>Samsung · TCL · Kalley · LG</p></div>
+      <span class="open">›</span>
+    </button>
+    <button class="cat" onclick="abrirCat('neveras')">
+      <span class="c-ico">🧊</span>
+      <div><h3>Neveras</h3><p>Samsung · Haceb · Electrolux · Whirlpool · LG · Kalley</p></div>
+      <span class="open">›</span>
+    </button>
+    <button class="cat" onclick="abrirCat('nevecones')">
+      <span class="c-ico">❄️</span>
+      <div><h3>Nevecones</h3><p>Samsung · LG · Electrolux · Whirlpool · Haceb · Kalley</p></div>
+      <span class="open">›</span>
+    </button>
+    <button class="cat" onclick="abrirCat('lavadoras')">
+      <span class="c-ico">🧺</span>
+      <div><h3>Lavadoras</h3><p>Kalley · Electrolux · Samsung · Haceb · LG · Whirlpool</p></div>
+      <span class="open">›</span>
+    </button>
+    <button class="cat" onclick="pronto()"><span class="c-ico">🌀</span><div><h3>Ventiladores</h3><p>Pedestal, pared y techo</p></div><span class="soon">Pronto</span></button>
+    <button class="cat" onclick="pronto()"><span class="c-ico">🔌</span><div><h3>Pequeños Electros</h3><p>Licuadoras, arroceras, planchas…</p></div><span class="soon">Pronto</span></button>
+    <button class="cat" onclick="pronto()"><span class="c-ico">💅</span><div><h3>Belleza</h3><p>Cuidado personal</p></div><span class="soon">Pronto</span></button>
+    <button class="cat" onclick="pronto()"><span class="c-ico">📱</span><div><h3>Tecnología</h3><p>Celulares y accesorios</p></div><span class="soon">Pronto</span></button>
+  </div>
+</section>
+
+<section class="view" id="v-tv">
+  <button class="back" onclick="go('v-port')">← Otras categorías</button>
+  <h2 style="font-size:1.4rem;color:var(--navy)">📺 Televisores</h2>
+  <p style="font-size:.9rem;color:var(--muted);margin-bottom:.3rem">Toca una marca para filtrar:</p>
+  <div class="chips" id="chips"></div>
+  <div class="prod-grid" id="tvGrid"></div>
+  <button class="btn btn-ghost" onclick="noEncuentro()">🔍 No encuentro lo que busco</button>
+</section>
+
+<section class="view" id="v-neveras">
+  <button class="back" onclick="go('v-port')">← Otras categorías</button>
+  <h2 style="font-size:1.4rem;color:var(--navy)">🧊 Neveras</h2>
+  <p style="font-size:.9rem;color:var(--muted);margin-bottom:.3rem">Toca una marca para filtrar:</p>
+  <div class="chips" id="chipsNev"></div>
+  <div class="prod-grid" id="nevGrid"></div>
+  <button class="btn btn-ghost" onclick="noEncuentro()">🔍 No encuentro lo que busco</button>
+</section>
+
+<section class="view" id="v-nevecones">
+  <button class="back" onclick="go('v-port')">← Otras categorías</button>
+  <h2 style="font-size:1.4rem;color:var(--navy)">❄️ Nevecones</h2>
+  <p style="font-size:.9rem;color:var(--muted);margin-bottom:.3rem">Toca una marca para filtrar:</p>
+  <div class="chips" id="chipsNvc"></div>
+  <div class="prod-grid" id="nvcGrid"></div>
+  <button class="btn btn-ghost" onclick="noEncuentro()">🔍 No encuentro lo que busco</button>
+</section>
+
+<section class="view" id="v-lav">
+  <button class="back" onclick="go('v-port')">← Otras categorías</button>
+  <h2 style="font-size:1.4rem;color:var(--navy)">🧺 Lavadoras</h2>
+  <p style="font-size:.9rem;color:var(--muted);margin-bottom:.3rem">Toca una marca para filtrar:</p>
+  <div class="chips" id="chipsLav"></div>
+  <div class="prod-grid" id="lavGrid"></div>
+  <button class="btn btn-ghost" onclick="noEncuentro()">🔍 No encuentro lo que busco</button>
+</section>
+
+<section class="view" id="v-cart">
+  <button class="back" onclick="go('v-port')">← Seguir mirando productos</button>
+  <h2 style="font-size:1.4rem;margin-bottom:1rem;color:var(--navy)">🛒 Tu pedido</h2>
+  <div id="cartList"></div>
+  <button class="btn btn-amber" id="btnSendCart" onclick="sendCart()">📲 Enviar pedido por WhatsApp</button>
+  <button class="btn btn-ghost" onclick="vaciarCart()">🗑️ Vaciar pedido</button>
+</section>
+
+<section class="view" id="v-gar">
+  <button class="back" onclick="go('v-home')">← Volver al inicio</button>
+  <div class="card">
+    <div class="wiz-head">
+      <h2>🛡️ Garantía</h2>
+      <span class="step-tag" id="stepTag">Paso 1 de 5</span>
+    </div>
+    <div class="progress"><div class="bar" id="progBar"></div></div>
+
+    <div class="step" data-step="1">
+      <label style="margin-top:0">¿La novedad es de…? *</label>
+      <div class="tipo-grid">
+        <div class="tipo-card" onclick="setTipo('Preventa',this)">
+          <span class="t-ico">📦</span>
+          <div><h4>Preventa</h4><p>Llegó con novedad antes de venderlo. Solo pedimos NIT y producto.</p></div>
+        </div>
+        <div class="tipo-card" onclick="setTipo('Postventa',this)">
+          <span class="t-ico">🔧</span>
+          <div><h4>Postventa</h4><p>Ya fue vendido al cliente final y presentó falla.</p></div>
+        </div>
+      </div>
+      <p class="err-msg" id="err-tipo">Selecciona una opción para continuar.</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <h3 style="font-size:1.1rem;margin-bottom:.2rem">👤 Datos del cliente final</h3>
+      <label>Nombre completo *</label>
+      <input type="text" id="g-nombre">
+      <p class="err-msg" id="e-nombre">Escribe el nombre del cliente.</p>
+      <div class="row2">
+        <div><label>Cédula (CC) *</label><input type="text" id="g-cc" inputmode="numeric" placeholder="Solo números"><p class="err-msg" id="e-cc">Cédula inválida.</p></div>
+        <div><label>Celular *</label><input type="tel" id="g-cel" inputmode="numeric" placeholder="3001234567"><p class="err-msg" id="e-cel">Celular de 10 dígitos, inicia con 3.</p></div>
+      </div>
+      <div class="row2">
+        <div><label>Municipio *</label><input type="text" id="g-mun" list="municipios">
+          <datalist id="municipios">
+            <option>Angostura</option><option>Campamento</option><option>Carolina del Príncipe</option>
+            <option>Donmatías</option><option>Entrerríos</option><option>Gómez Plata</option>
+            <option>Guadalupe</option><option>Ituango</option><option>San Andrés de Cuerquia</option>
+            <option>San José de la Montaña</option><option>San Pedro de los Milagros</option>
+            <option>Santa Rosa de Osos</option><option>Toledo</option><option>Valdivia</option><option>Yarumal</option>
+            <option>Abriaquí</option><option>Anzá</option><option>Armenia Mantequilla</option>
+            <option>Buriticá</option><option>Caicedo</option><option>Cañasgordas</option>
+            <option>Dabeiba</option><option>Ebéjico</option><option>Frontino</option>
+            <option>Giraldo</option><option>Heliconia</option><option>Liborina</option>
+            <option>Olaya</option><option>Peque</option><option>Sabanalarga</option>
+            <option>San Jerónimo</option><option>Santa Fe de Antioquia</option>
+            <option>Sopetrán</option><option>Uramita</option><option>Otro municipio</option>
+          </datalist>
+        </div>
+        <div><label>Dirección *</label><input type="text" id="g-dir" placeholder="Calle 10 # 20-30"></div>
+      </div>
+      <p class="err-msg" id="e-mun-dir">Completa municipio y dirección.</p>
+      <label>Correo electrónico *</label>
+      <input type="email" id="g-mail" placeholder="cliente@correo.com">
+      <p class="err-msg" id="e-mail">Correo inválido.</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <h3 style="font-size:1.1rem;margin-bottom:.2rem">📟 Datos del producto</h3>
+      <div class="row2">
+        <div><label>Marca *</label><input type="text" id="g-marca"></div>
+        <div><label>Serial *</label><input type="text" id="g-serial" placeholder="Como aparece en la etiqueta"></div>
+      </div>
+      <p class="err-msg" id="e-marca-serial">Completa marca y serial.</p>
+      <div class="row2">
+        <div><label>Fecha de compra *</label><input type="date" id="g-fecha"><p class="err-msg" id="e-fecha">Indica la fecha (o la más aproximada).</p></div>
+        <div><label>Tipo de daño *</label>
+          <select id="g-dano">
+            <option value="">Selecciona…</option>
+            <option>No enciende</option><option>Falla de batería / carga</option>
+            <option>Pantalla / panel dañado</option><option>Puertos / conectores</option>
+            <option>Falla de software / sistema</option><option>Ruido / sonido anormal</option>
+            <option>Daño físico visible</option><option>Llegó incompleto / equivocado</option><option>Otro</option>
+          </select>
+          <p class="err-msg" id="e-dano">Selecciona el tipo de daño.</p>
+        </div>
+      </div>
+      <label>Describe la novedad <small>(opcional)</small></label>
+      <textarea id="g-desc" rows="2" placeholder="Ej: no carga desde el primer día…"></textarea>
+    </div>
+
+    <div class="step" data-step="4">
+      <h3 style="font-size:1.1rem;margin-bottom:.2rem">📸 Evidencias</h3>
+      <p style="font-size:.88rem;color:var(--muted)">Las fotos abren tu cámara. El video: <b>máximo 20 segundos</b>.</p>
+      <div class="upload-grid">
+        <label class="upload" id="u1" for="f-serial"><span class="badge-ok" style="display:none">✓ Lista</span>
+          <div class="u-ico">📷</div><h4>Foto del serial</h4><p>La etiqueta con el número de serie</p>
+          <input type="file" id="f-serial" accept="image/*" capture="environment" hidden><img class="preview" id="p-serial">
+        </label>
+        <label class="upload" id="u2" for="f-novedad"><span class="badge-ok" style="display:none">✓ Lista</span>
+          <div class="u-ico">📷</div><h4>Foto de la novedad</h4><p>Donde se vea el daño o detalle</p>
+          <input type="file" id="f-novedad" accept="image/*" capture="environment" hidden><img class="preview" id="p-novedad">
+        </label>
+        <label class="upload" id="u3" for="f-video"><span class="badge-ok" style="display:none">✓ Listo</span>
+          <div class="u-ico">🎬</div><h4>Video corto</h4><p>Máximo 20 segundos · muestra la falla</p>
+          <input type="file" id="f-video" accept="video/*" capture="environment" hidden><span class="dur-badge" id="durBadge" style="display:none"></span>
+        </label>
+      </div>
+      <p class="err-msg" id="e-evid">Necesitas las 3 evidencias: foto del serial, foto de la novedad y video.</p>
+    </div>
+
+    <div class="step" data-step="5">
+      <h3 style="font-size:1.1rem;margin-bottom:.2rem">🏪 Cliente Corbeta</h3>
+      <label>NIT *</label>
+      <input type="text" id="g-nit" inputmode="numeric" placeholder="Solo el NIT, lo demás lo tengo yo ✅">
+      <p class="err-msg" id="e-nit">Escribe el NIT del cliente Corbeta.</p>
+      <h3 style="font-size:1.1rem;margin:1.3rem 0 .6rem">✅ Revisemos antes de enviar</h3>
+      <div class="sum" id="sumBox"></div>
+    </div>
+
+    <button class="btn btn-ghost" id="btnBack" style="display:none" onclick="prevStep()">← Atrás</button>
+    <button class="btn btn-navy" id="btnNext" onclick="nextStep()">Siguiente →</button>
+  </div>
+</section>
+
+<section class="view" id="v-ok">
+  <div class="card success">
+    <div class="check">✓</div>
+    <h2 id="okTitle" style="font-size:1.4rem">¡Caso registrado!</h2>
+    <p style="font-size:.9rem;color:var(--muted);margin-top:.4rem">Guárdalo, es tu número de radicado:</p>
+    <div class="case-code" id="caseCode">CV-0000</div>
+    <p id="cloudStatus" style="font-size:.9rem;margin-top:.8rem;line-height:1.5"></p>
+    <p id="debugMsg" class="debug"></p>
+    <p style="font-size:.9rem;line-height:1.5;margin-top:.8rem">📎 <b>Importante:</b> envía las fotos y el video adjuntos en el chat para completar el radicado.</p>
+    <button class="btn btn-ghost" id="btnRetry" style="display:none" onclick="reintentar()">📡 Reintentar envío</button>
+    <button class="btn btn-navy" onclick="sendWA()">📲 Enviar resumen por WhatsApp</button>
+    <button class="btn btn-ghost" onclick="resetAll()">Volver al inicio</button>
+  </div>
+</section>
+
+</main>
+
+<button class="fab-home" onclick="go('v-home')" aria-label="Ir al inicio">🏠 Inicio</button>
+<button class="fab" id="fab" onclick="openCart()" aria-label="Ver pedido">🛒 Pedido <span class="cnt" id="fabCnt">0</span></button>
+<div class="toast" id="toast"></div>
+
+<footer>
+  <span class="footer-brand">Camilo Virtual</span>
+  Hecho para la ruta · Electrónica y Tecnología<br>
+  <b>Corbeta</b> · Rutas Norte y Occidente
+</footer>
+
+<script>
+const URL_NUBE='https://script.google.com/macros/s/AKfycbyqM5mkd0vfewVXTGImR8cdxJfGfmvE0HFI0cdwE9tKPV_1bEq-qiXxISKkL5c9u2GiyQ/exec';
+const TU_WHATSAPP='573164479695';
+
+const CATALOGO=[
+ /* ===== SAMSUNG TV ===== */
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 55" Mini LED M75H 4K (2026)',
+  desc:'4K de 55" con tecnología Mini LED: contraste profundo y Color de espectro puro. Procesador Mini LED 4K con Mejora a 4K, Mini LED HDR y Motion Xcelerator. Sonido envolvente OTS Lite + Q-Symphony y One UI Tizen con SmartThings, AirPlay y Google Cast. Diseño MetalStream casi sin bordes.',
+  specs:['55" 4K UHD','Mini LED HDR','120 Hz DLG','OTS Lite + Q-Symphony','Tizen · SmartThings','3 HDMI · BT 5.3'],
+  ean:'8806097960843',img:'https://drive.google.com/file/d/1CBQ5p5LLRb6RrOApX8-81c2yxJ4sNXn7/view?usp=sharing',ph:'mini'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 65" Mini LED M75H 4K (2026)',
+  desc:'La plataforma Mini LED de la serie M75H en pantalla grande de 65": contraste profundo con Color de espectro puro, Procesador Mini LED 4K con Mejora a 4K y Mini LED HDR. Sonido OTS Lite + Q-Symphony, One UI Tizen con SmartThings, AirPlay y Google Cast, y diseño MetalStream casi sin bordes. Ideal para salas y vitrinas de alto impacto.',
+  specs:['65" 4K UHD','Mini LED HDR','120 Hz DLG','OTS Lite + Q-Symphony','Tizen · SmartThings','3 HDMI · BT 5.3'],
+  ean:'8806097960942',img:'https://drive.google.com/file/d/1rd6r_h1QZ1JycWquq559dVn7v4bt0JQ-/view?usp=drive_link',ph:'mini'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 75" Mini LED 4K M75H (2026)',
+  desc:'La serie Mini LED M75H en formato gigante de 75": contraste profundo con Color de espectro puro, Procesador Mini LED 4K con Mejora a 4K y Mini LED HDR. Sonido OTS Lite + Q-Symphony, One UI Tizen con SmartThings, AirPlay y Google Cast, y diseño MetalStream casi sin bordes. Experiencia de cine para salas amplias, negocios y vitrinas.',
+  specs:['75" 4K UHD','Mini LED HDR','120 Hz DLG','OTS Lite + Q-Symphony','Tizen · SmartThings','3 HDMI · BT 5.3'],
+  ean:'8806097960874',img:'https://drive.google.com/file/d/19z51p18kOJyZQG6hc6PNVMD5Q6jJyWrv/view?usp=drive_link',ph:'mini'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 55" The Frame 4K LS03F',
+  desc:'El TV que se convierte en obra de arte: Modo Arte con sensor de movimiento y Matte Display antirreflejos con acabado tipo impresión. Panel QLED 4K con Quantum Dot y Quantum HDR, imagen mejorada con Samsung Vision AI (NQ4 AI Gen2), hasta 144 Hz y montaje Slim Fit pegado a la pared. No parece un televisor apagado: parece un cuadro.',
+  specs:['55" 4K QLED','Matte Display','Modo Arte · Art Store','Quantum HDR','Vision AI · 144 Hz','Slim Fit'],
+  ean:'8806095715414',img:'https://drive.google.com/file/d/16omAe46POBijnrxVJsZ7tBWQuECQXl80/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'40" Full HD F6000 Smart TV',
+  desc:'Smart TV Full HD (1920×1080) con HDR10+ y motor de imagen Hyper Real. Sistema Tizen con canales gratis, 2 HDMI, USB y Wi-Fi. El tamaño justo para cocinas, habitaciones y negocios pequeños.',
+  specs:['40" Full HD','HDR10+','Tizen · TV Plus','2 HDMI · USB · Wi-Fi','60 Hz'],
+  ean:'8806095967806',img:'https://drive.google.com/file/d/1ze7oJvyb59E8YFgF9nQxyRhFN8PvCrdr/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 43" Crystal 4K U8000F',
+  desc:'Crystal UHD 4K con Crystal Processor 4K que escala tu contenido a 4K, mapeo de color 3D y PurColor para tonos vivos. HDR10+ y One UI Tizen con más de 2.700 canales gratis. Perfecto para espacios pequeños con imagen grande.',
+  specs:['43" 4K UHD','Crystal Processor 4K','HDR10+','PurColor','Tizen · TV Plus'],
+  ean:'8806097027331',img:'https://drive.google.com/file/d/1EzPB9r4scrcS3cRX7TqFSnL-V_1w9kHS/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'55" Crystal UHD 4K TU8500',
+  desc:'Crystal UHD 4K con Crystal Processor 4K y HDR: gama media con pinta premium. Tizen con tus apps favoritas, 3 HDMI y 2 USB para consolas y accesorios. Un todoterreno para sala o negocio.',
+  specs:['55" 4K UHD','Crystal Processor 4K','HDR','3 HDMI · 2 USB','Tizen'],
+  ean:'8806097954767',img:'https://drive.google.com/file/d/1keQkVCUCpR_NA9-yuN_v91ZA4vb5pfL7/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 58" Crystal UHD 4K U8500H (2026)',
+  desc:'Crystal UHD 4K de 58" con Crystal Processor 4K que mejora y escala el contenido a 4K, HDR y PurColor. One UI Tizen con Samsung Vision AI Companion, AirPlay y experiencia multidispositivo. El punto medio perfecto entre sala y vitrina.',
+  specs:['58" 4K UHD','Crystal Processor 4K','HDR · PurColor','Vision AI · AirPlay','Tizen'],
+  ean:'8806097953371',img:'https://drive.google.com/file/d/1KZxLsD3lN6Oi0HIJdnjVUvSK2rtx288B/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 65" Crystal UHD 4K U8500H (2026)',
+  desc:'Crystal UHD 4K de 65" con Crystal Processor 4K que mejora y escala el contenido a 4K, HDR y PurColor. One UI Tizen con Samsung Vision AI Companion, AirPlay y experiencia multidispositivo. Presencia de sobra para salas amplias.',
+  specs:['65" 4K UHD','Crystal Processor 4K','HDR · PurColor','Vision AI · AirPlay','Tizen'],
+  ean:'8806097953395',img:'https://drive.google.com/file/d/1yxLuqolwPpfheAMK0fgkTlVN_GOCLDmA/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 75" Crystal UHD 4K U8500H (2026)',
+  desc:'Crystal UHD 4K de 75" con Crystal Processor 4K que mejora y escala el contenido a 4K, HDR y PurColor. One UI Tizen con Samsung Vision AI Companion, AirPlay y experiencia multidispositivo. Formato gigante para negocios y salas de alto impacto.',
+  specs:['75" 4K UHD','Crystal Processor 4K','HDR · PurColor','Vision AI · AirPlay','Tizen'],
+  ean:'8806099123215',img:'https://drive.google.com/file/d/1SznsXM2V_hGrKxT_9eqcoHbus0cMzm4F/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 75" Crystal 4K U8000F (2025)',
+  desc:'Crystal UHD 4K de 75" con Crystal Processor 4K, escalado a 4K y mapeo de color 3D para tonos precisos. HDR10+ y One UI Tizen con más de 2.700 canales gratis. Pantalla gigante a precio inteligente.',
+  specs:['75" 4K UHD','Crystal Processor 4K','HDR10+','PurColor','Tizen · TV Plus'],
+  ean:'8806097029359',img:'https://drive.google.com/file/d/10oV4AjdtlAp1G6TYPobt1p6PJ9YfLNP3/view?usp=drive_link'},
+ {cat:'televisores',marca:'Samsung',nombre:'Televisor Smart 85" Crystal UHD 4K U8500H (2026)',
+  desc:'El gigante de la familia Crystal: 85" en 4K con Crystal Processor 4K, HDR y PurColor. One UI Tizen con Samsung Vision AI Companion, AirPlay y experiencia multidispositivo. Para vitrinas, salas de juntas y cine en casa de verdad.',
+  specs:['85" 4K UHD','Crystal Processor 4K','HDR · PurColor','Vision AI · AirPlay','Tizen'],
+  ean:'8806097954774',img:'https://drive.google.com/file/d/1BbscEzJZ4MogmlcHCI2zE0RAG3u4ao6X/view?usp=drive_link'},
+ /* ===== TCL TV ===== */
+ {cat:'televisores',marca:'TCL',nombre:'Smart TV TCL Roku TV 32" QLED FHD S5LR',
+  desc:'QLED Full HD con el sistema Roku TV: el más fácil de usar para todos en la casa. Colores vivos, Dolby Audio para sonido claro y contraste 5000:1. Perfecto para dormitorios, cocinas y negocios pequeños.',
+  specs:['32" QLED FHD','Roku TV','Dolby Audio','HDR10','2 HDMI · USB','60 Hz'],
+  ean:'6937574882838',img:'https://drive.google.com/file/d/1CNfKcYhjL1GrJQ17oj4KYILRKmbnnQfl/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 32" S5K FHD QLED',
+  desc:'El único Full HD en Colombia con tecnología QLED: colores vivos, HDR10 y Dolby Audio. Diseño metálico sin bordes, Google Cast y WiFi+Bluetooth. Perfecto para espacios pequeños sin sacrificar calidad de imagen.',
+  specs:['32" QLED FHD','HDR10','Dolby Audio','Google Cast','Procesador quad-core','Wi-Fi + BT'],
+  ean:'6921732899332',img:'https://drive.google.com/file/d/136_fXj-jg2liuzpfA14bJP--_VIyTj8G/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 43" S5K FHD QLED',
+  desc:'Full HD con QLED en 43": colores vivos, HDR10 y Dolby Audio. Diseño metálico sin bordes, Google Cast y WiFi+Bluetooth. El tamaño más vendido para salas pequeñas y negocios.',
+  specs:['43" QLED FHD','HDR10','Dolby Audio','Google Cast','Procesador quad-core','Wi-Fi + BT'],
+  ean:'6921732899356',img:'https://drive.google.com/file/d/1dS7B5r0UvUychZ9dfo8yyMVVLxuHeEVk/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 50" S5K FHD QLED',
+  desc:'Full HD con QLED en 50": colores vivos, HDR10 y Dolby Audio. Diseño metálico sin bordes, Google TV integrado y WiFi+Bluetooth. El balance perfecto entre precio y pantalla grande.',
+  specs:['50" QLED FHD','Google TV','HDR10','Dolby Audio','Procesador quad-core','Wi-Fi + BT'],
+  ean:'6937574810107',img:'https://drive.google.com/file/d/1LN9j6tJTb_LYabDs-jsKGmkzzw0x1o4a/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 50" V6C 4K-UHD',
+  desc:'4K UHD con HDR AI que optimiza automáticamente el HDR de cualquier contenido. Procesador AiPQ Pro, Dolby Audio y Google TV. La entrada al mundo 4K con la tecnología que necesitas.',
+  specs:['50" 4K UHD','HDR AI','AiPQ Pro','Dolby Audio','Google TV','Direct-LED'],
+  ean:'6921732899370',img:'https://drive.google.com/file/d/1GyvN3lEvq7G836ez4v4JxaOuIh1l9u0p/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 55" V6C 4K-UHD',
+  desc:'4K UHD con HDR AI que optimiza automáticamente el HDR de cualquier contenido. Procesador AiPQ Pro, Dolby Audio y Google TV. El tamaño más buscado en 4K para sala o negocio.',
+  specs:['55" 4K UHD','HDR AI','AiPQ Pro','Dolby Audio','Google TV','Direct-LED'],
+  ean:'6921732899387',img:'https://drive.google.com/file/d/1G1UBtuo9pI2BrWMMDnbJ3My3pasRsYIk/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 65" V6C 4K-UHD',
+  desc:'4K UHD con HDR AI que optimiza automáticamente el HDR de cualquier contenido. Procesador AiPQ Pro, Dolby Audio y Google TV. Pantalla grande a precio 4K accesible.',
+  specs:['65" 4K UHD','HDR AI','AiPQ Pro','Dolby Audio','Google TV','Direct-LED'],
+  ean:'6921732899394',img:'https://drive.google.com/file/d/1kVuAmsxnE3LNx0oNJlkMBcVfZN6duXvr/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 75" V6C 4K-UHD',
+  desc:'4K UHD en 75" con HDR AI que optimiza automáticamente el HDR de cualquier contenido. Procesador AiPQ Pro, Dolby Audio y Google TV. La entrada al cine en casa a gran formato.',
+  specs:['75" 4K UHD','HDR AI','AiPQ Pro','Dolby Audio','Google TV','Direct-LED'],
+  ean:'6921732899400',img:'https://drive.google.com/file/d/1kRSIJ7Co1BA1-fA9A3dk-kDSrfei_QIt/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 43" P7L QLED 4K-UHD',
+  desc:'Premium QLED 4K con gama de colores ultra amplia (93% DCI-P3), más de mil millones de tonos. Procesador AiPQ, Dolby Vision + HDR10+, MEMC para movimiento suave y baja luz azul para cuidar tus ojos. Google TV integrado.',
+  specs:['43" QLED 4K','AiPQ Processor','Dolby Vision · HDR10+','Google TV','93% DCI-P3','MEMC · 60 Hz'],
+  ean:'6937574837517',img:'https://drive.google.com/file/d/1ersV59R5oHnLjnCsAcqtKnWjXvYSVhGZ/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 55" P7L QLED 4K-UHD',
+  desc:'Premium QLED 4K con gama de colores ultra amplia (93% DCI-P3), más de mil millones de tonos. Procesador AiPQ, Dolby Vision + HDR10+, MEMC para movimiento suave y baja luz azul para cuidar tus ojos. Google TV integrado.',
+  specs:['55" QLED 4K','AiPQ Processor','Dolby Vision · HDR10+','Google TV','93% DCI-P3','MEMC · 60 Hz'],
+  ean:'6937574837531',img:'https://drive.google.com/file/d/1ersV59R5oHnLjnCsAcqtKnWjXvYSVhGZ/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 65" P7L QLED 4K-UHD',
+  desc:'Premium QLED 4K con gama de colores ultra amplia (93% DCI-P3), más de mil millones de tonos. Procesador AiPQ, Dolby Vision + HDR10+, MEMC para movimiento suave y baja luz azul para cuidar tus ojos. Google TV integrado.',
+  specs:['65" QLED 4K','AiPQ Processor','Dolby Vision · HDR10+','Google TV','93% DCI-P3','MEMC · 60 Hz'],
+  ean:'6937574837555',img:'https://drive.google.com/file/d/1ersV59R5oHnLjnCsAcqtKnWjXvYSVhGZ/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 75" P7L QLED 4K-UHD',
+  desc:'Premium QLED 4K con gama de colores ultra amplia (93% DCI-P3), más de mil millones de tonos. Procesador AiPQ, Dolby Vision + HDR10+, MEMC para movimiento suave y baja luz azul para cuidar tus ojos. Google TV integrado. Formato gigante para salas y negocios.',
+  specs:['75" QLED 4K','AiPQ Processor','Dolby Vision · HDR10+','Google TV','93% DCI-P3','MEMC · 60 Hz'],
+  ean:'6937574837098',img:'https://drive.google.com/file/d/1ersV59R5oHnLjnCsAcqtKnWjXvYSVhGZ/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 55" P8K QLED 4K-UHD',
+  desc:'QLED 4K con cristales cuánticos coloridos de próxima generación, 144 Hz nativos para gaming fluido con VRR y ALLM, Google TV y procesador AiPQ Pro. Ideal para gamers y amantes del cine con pantalla grande.',
+  specs:['55" QLED 4K','144 Hz · VRR · ALLM','AiPQ Pro','Google TV','HDR10+','HDMI 2.1'],
+  ean:'6921732899448',img:'https://drive.google.com/file/d/1b7GiV4ZafUcAG0s3Y4QeGyBvZUE_oJoK/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 65" P8K QLED 4K-UHD',
+  desc:'QLED 4K con cristales cuánticos coloridos de próxima generación, 144 Hz nativos para gaming fluido con VRR y ALLM, Google TV y procesador AiPQ Pro. Ideal para gamers y amantes del cine con pantalla grande.',
+  specs:['65" QLED 4K','144 Hz · VRR · ALLM','AiPQ Pro','Google TV','HDR10+','HDMI 2.1'],
+  ean:'6921732899455',img:'https://drive.google.com/file/d/1b7GiV4ZafUcAG0s3Y4QeGyBvZUE_oJoK/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 75" P8K QLED 4K-UHD',
+  desc:'QLED 4K con cristales cuánticos coloridos de próxima generación, 144 Hz nativos para gaming fluido con VRR y ALLM, Google TV y procesador AiPQ Pro. Formato gigante para gamers y salas de cine en casa.',
+  specs:['75" QLED 4K','144 Hz · VRR · ALLM','AiPQ Pro','Google TV','HDR10+','HDMI 2.1'],
+  ean:'6921732899462',img:'https://drive.google.com/file/d/1b7GiV4ZafUcAG0s3Y4QeGyBvZUE_oJoK/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 85" P8K QLED 4K-UHD',
+  desc:'QLED 4K de 85" con cristales cuánticos coloridos de próxima generación, 144 Hz nativos para gaming fluido con VRR y ALLM, Google TV y procesador AiPQ Pro. Experiencia de cine para vitrinas y salas de alto impacto.',
+  specs:['85" QLED 4K','144 Hz · VRR · ALLM','AiPQ Pro','Google TV','HDR10+','HDMI 2.1'],
+  ean:'6921732898670',img:'https://drive.google.com/file/d/1b7GiV4ZafUcAG0s3Y4QeGyBvZUE_oJoK/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 98" P8K QLED 4K-UHD',
+  desc:'QLED 4K de 98" con cristales cuánticos coloridos de próxima generación, 144 Hz nativos para gaming fluido con VRR y ALLM, Google TV y procesador AiPQ Pro. El gigante de la familia P8K para experiencias de cine masivas.',
+  specs:['98" QLED 4K','144 Hz · VRR · ALLM','AiPQ Pro','Google TV','HDR10+','HDMI 2.1'],
+  ean:'6921732899479',img:'https://drive.google.com/file/d/1b7GiV4ZafUcAG0s3Y4QeGyBvZUE_oJoK/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 55" C6K QD-MiniLED 4K',
+  desc:'Premium QD-MiniLED con hasta 512 zonas de atenuación para negros profundos y brillo preciso. Contraste, color y claridad de IA, sonido ONKYO integrado, 144 Hz y Google TV. Tecnología insignia para quienes buscan lo mejor en imagen.',
+  specs:['55" QD-MiniLED 4K','512 zonas','144 Hz','Dolby Vision · Atmos','ONKYO','Google TV'],
+  ean:'6921732845438',img:'https://drive.google.com/file/d/1tUfJeTeMMfzEKZzDoADKYa9AR_aOX3Do/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 65" C6K QD-MiniLED 4K',
+  desc:'Premium QD-MiniLED con hasta 512 zonas de atenuación para negros profundos y brillo preciso. Contraste, color y claridad de IA, sonido ONKYO integrado, 144 Hz y Google TV. Tecnología insignia para quienes buscan lo mejor en imagen.',
+  specs:['65" QD-MiniLED 4K','512 zonas','144 Hz','Dolby Vision · Atmos','ONKYO','Google TV'],
+  ean:'6921732845452',img:'https://drive.google.com/file/d/1tUfJeTeMMfzEKZzDoADKYa9AR_aOX3Do/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 75" C6K QD-MiniLED 4K',
+  desc:'Premium QD-MiniLED con hasta 512 zonas de atenuación para negros profundos y brillo preciso. Contraste, color y claridad de IA, sonido ONKYO integrado, 144 Hz y Google TV. Tecnología insignia en formato gigante.',
+  specs:['75" QD-MiniLED 4K','512 zonas','144 Hz','Dolby Vision · Atmos','ONKYO','Google TV'],
+  ean:'6921732845483',img:'https://drive.google.com/file/d/1tUfJeTeMMfzEKZzDoADKYa9AR_aOX3Do/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 98" C8K QD-MiniLED 4K',
+  desc:'Premium QD-MiniLED de 98" con hasta 3840 zonas de atenuación, 4500 nits de brillo pico, 144 Hz nativos con VRR hasta 288 Hz. WiFi 6, 4 HDMI (2x HDMI 2.1), Google TV y Dolby Vision/Atmos. El tope de gama para experiencias cinematográficas masivas.',
+  specs:['98" QD-MiniLED 4K','3840 zonas · 4500 nits','144 Hz · VRR 288 Hz','Dolby Vision · Atmos','WiFi 6 · 4 HDMI 2.1','Google TV'],
+  ean:'6921732899523',img:'https://drive.google.com/file/d/1ub6dV-v60Pd0BKCxr-sVWdFo4YRQt88K/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 115" C7K QD-MiniLED 4K',
+  desc:'QD-MiniLED de 115" con más de 20,000 zonas de atenuación para control de luz ultra preciso. 144 Hz, Dolby Vision/Atmos, Google TV y HDMI 2.1. La pantalla más grande de la vitrina para experiencias de cine en casa de verdad.',
+  specs:['115" QD-MiniLED 4K','20,000+ zonas','144 Hz','Dolby Vision · Atmos','HDMI 2.1','Google TV'],
+  ean:'6921732899530',img:'https://drive.google.com/file/d/1PvexZc2EnEtmiPMaiQQmPglD92-xCPQj/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 55" A400PRO QD-MiniLED 4K',
+  desc:'Art TV estilo cuadro con diseño ultra delgado (39.9mm) y marco con acabado de nogal. QD-MiniLED con 448 zonas, 144 Hz nativos (DLG 288 Hz), HDMI 2.1 con VRR, Dolby Vision/Atmos y Google TV. Arte y entretenimiento en un solo equipo.',
+  specs:['55" QD-MiniLED 4K','Art TV · 39.9mm','448 zonas · 144 Hz','DLG 288 Hz · HDMI 2.1','Dolby Vision · Atmos','Google TV'],
+  ean:'6937574832598',img:'https://drive.google.com/file/d/1iI6dOFafU1NV6rJSeEB9gfyGxgf1xa3J/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 65" A400PRO QD-MiniLED 4K',
+  desc:'Art TV estilo cuadro con diseño ultra delgado (39.9mm) y marco con acabado de nogal. QD-MiniLED con 448 zonas, 144 Hz nativos (DLG 288 Hz), HDMI 2.1 con VRR, Dolby Vision/Atmos y Google TV. Arte y entretenimiento en un solo equipo.',
+  specs:['65" QD-MiniLED 4K','Art TV · 39.9mm','448 zonas · 144 Hz','DLG 288 Hz · HDMI 2.1','Dolby Vision · Atmos','Google TV'],
+  ean:'6937574832574',img:'https://drive.google.com/file/d/1iI6dOFafU1NV6rJSeEB9gfyGxgf1xa3J/view?usp=drive_link'},
+ {cat:'televisores',marca:'TCL',nombre:'TV TCL 75" A400PRO QD-MiniLED 4K',
+  desc:'Art TV estilo cuadro con diseño ultra delgado (39.9mm) y marco con acabado de nogal. QD-MiniLED con 448 zonas, 144 Hz nativos (DLG 288 Hz), HDMI 2.1 con VRR, Dolby Vision/Atmos y Google TV. Arte y entretenimiento en formato gigante.',
+  specs:['75" QD-MiniLED 4K','Art TV · 39.9mm','448 zonas · 144 Hz','DLG 288 Hz · HDMI 2.1','Dolby Vision · Atmos','Google TV'],
+  ean:'6937574832550',img:'https://drive.google.com/file/d/1iI6dOFafU1NV6rJSeEB9gfyGxgf1xa3J/view?usp=drive_link'},
+ /* ===== KALLEY TV ===== */
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 55" 55GM405 MiniLED',
+  desc:'MiniLED QLED 4K para gaming con 144 Hz, subwoofer y barra de sonido integrada de 50W, Google TV, Dolby Vision/Atmos y procesador con IA. La combinación perfecta de imagen premium y audio potente para gamers y cinéfilos.',
+  specs:['55" MiniLED QLED 4K','144 Hz Gaming','50W Subwoofer','Dolby Vision · Atmos','Google TV','HDMI 2.1'],
+  ean:'7705946478236',img:'https://drive.google.com/file/d/1hEKgE6W1usYqLsQ-xzwrKaLaOD6RTPdr/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 65" 65GM405 MiniLED',
+  desc:'MiniLED QLED 4K para gaming con 144 Hz, subwoofer y barra de sonido integrada de 50W, Google TV, Dolby Vision/Atmos y procesador con IA. Pantalla grande para salas amplias con imagen y sonido de cine.',
+  specs:['65" MiniLED QLED 4K','144 Hz Gaming','50W Subwoofer','Dolby Vision · Atmos','Google TV','HDMI 2.1'],
+  ean:'7705946474313',img:'https://drive.google.com/file/d/1ZJKk86t2AFgwznvdUaYy92e2jczCnPVo/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 75" 75GM405 MiniLED',
+  desc:'MiniLED QLED 4K para gaming con 144 Hz, subwoofer y barra de sonido integrada de 50W, Google TV, Dolby Vision/Atmos y procesador con IA. Formato gigante para experiencias de cine en casa.',
+  specs:['75" MiniLED QLED 4K','144 Hz Gaming','50W Subwoofer','Dolby Vision · Atmos','Google TV','HDMI 2.1'],
+  ean:'7705946480857',img:'https://drive.google.com/file/d/1b7Q_tDISsQ86Oi-cQUa6PNCk1snEJM8C/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 86" 86GM405 MiniLED',
+  desc:'MiniLED QLED 4K para gaming con 144 Hz, subwoofer y barra de sonido integrada de 50W, Google TV, Dolby Vision/Atmos y procesador con IA. Pantalla de 86" para vitrinas y salas de alto impacto.',
+  specs:['86" MiniLED QLED 4K','144 Hz Gaming','50W Subwoofer','Dolby Vision · Atmos','Google TV','HDMI 2.1'],
+  ean:'7705946480864',img:'https://drive.google.com/file/d/1D-1rcLiPbHFi3fpySZ6n7opo-13NwL0X/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 98" 98GM405 MiniLD',
+  desc:'MiniLED QLED 4K para gaming con 144 Hz, subwoofer y barra de sonido integrada de 50W, Google TV, Dolby Vision/Atmos y procesador con IA. Formato masivo de 98" para experiencias cinematográficas sin salir de casa.',
+  specs:['98" MiniLED QLED 4K','144 Hz Gaming','50W Subwoofer','Dolby Vision · Atmos','Google TV','HDMI 2.1'],
+  ean:'7705946480840',img:'https://drive.google.com/file/d/1-ysAScycrlnMm9zp93bFh6zEpBwdCylp/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 115" 115GM405 MiniLD',
+  desc:'MiniLED QLED 4K de 115" para gaming con 144 Hz, subwoofer de 120W, Google TV, Dolby Vision/Atmos y procesador con IA. La pantalla más grande de Kalley para salas de cine en casa de verdad.',
+  specs:['115" MiniLED QLED 4K','144 Hz Gaming','120W Subwoofer','Dolby Vision · Atmos','Google TV','HDMI 2.1'],
+  ean:'7705946480833',img:'https://drive.google.com/file/d/17_CCk5H91kcQ2wT_95A893lvRm-_Uj9L/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 43" K-TV43G315 4KUHD',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego y procesador AiPQ con IA que mejora color y contraste. Bluetooth, USB y HDMI. Perfecto para habitaciones y espacios pequeños.',
+  specs:['43" 4K UHD LED','120 Hz','Dolby Vision · Atmos','Google TV','Modo Juego','2 HDMI · USB'],
+  ean:'7705946476935',img:'https://drive.google.com/file/d/151aoRF2uQ-sYsshm8A9nKELmkM0m4_a5/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 50" K-TV50G315 4KUHD',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego y procesador AiPQ con IA que mejora color y contraste. Bluetooth, USB y HDMI. El tamaño más vendido para salas pequeñas y negocios.',
+  specs:['50" 4K UHD LED','120 Hz','Dolby Vision · Atmos','Google TV','Modo Juego','2 HDMI · USB'],
+  ean:'7705946476942',img:'https://drive.google.com/file/d/1DjTtGDulqgr4_NiN8VSbA8VcbHT7UaaG/view?usp=sharing'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 50" 50G315A 4K',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego y procesador AiPQ con IA que mejora color y contraste. Bluetooth, USB y HDMI. Versión alternativa del G315 con las mismas prestaciones.',
+  specs:['50" 4K UHD LED','120 Hz','Dolby Vision · Atmos','Google TV','Modo Juego','2 HDMI · USB'],
+  ean:'7705946481519',img:'https://drive.google.com/file/d/1So0sQvHZe_EkKQCEO0ume5ycNy8M6gcV/view?usp=sharing'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 55" K-TV55G315 4KUHD',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego y procesador AiPQ con IA que mejora color y contraste. Bluetooth, USB y HDMI. El tamaño más buscado para salas medianas.',
+  specs:['55" 4K UHD LED','120 Hz','Dolby Vision · Atmos','Google TV','Modo Juego','2 HDMI · USB'],
+  ean:'7705946476980',img:'https://drive.google.com/file/d/1js2SnUtTLGPhAN0nitwlHI2pBrtYyOv5/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 55" 55G315A 4K',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego y procesador AiPQ con IA que mejora color y contraste. Bluetooth, USB y HDMI. Versión alternativa del G315 con las mismas prestaciones.',
+  specs:['55" 4K UHD LED','120 Hz','Dolby Vision · Atmos','Google TV','Modo Juego','2 HDMI · USB'],
+  ean:'7705946481526',img:'https://drive.google.com/file/d/1tpzw8Etb_nagGBvtexrzwinmf2MaYJHh/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 65" K-TV65G315 4KUHD',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego y procesador AiPQ con IA que mejora color y contraste. Bluetooth, USB y HDMI. Pantalla grande para salas amplias.',
+  specs:['65" 4K UHD LED','120 Hz','Dolby Vision · Atmos','Google TV','Modo Juego','2 HDMI · USB'],
+  ean:'7705946477086',img:'https://drive.google.com/file/d/1L9YwEou1QjeN1r77YbMVBmNu9euUmU8K/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 60" K-TV60G310 4KUHD',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, 3 puertos HDMI, 20W de sonido y control por voz con Google Assistant. Ajuste automático de imagen con IA y tecnología de cuidado ocular. 2 años de garantía.',
+  specs:['60" 4K UHD LED','Google TV','Dolby Vision · Atmos','Google Assistant','3 HDMI · 20W','Cuidado ocular'],
+  ean:'7705946480222',img:'https://drive.google.com/file/d/1MJ-T5Dhh6gXQpSaCyVzEmRL9_rK2J_vv/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 60" K-TV60G300 4KUHD',
+  desc:'LED 4K UHD con Google TV, Dolby Vision/Atmos, Bluetooth 5.1, Wi-Fi y 2GB de RAM. Imagen nítida y sonido envolvente para salas medianas. Versión básica con todas las funciones esenciales.',
+  specs:['60" 4K UHD LED','Google TV','Dolby Vision · Atmos','BT 5.1 · Wi-Fi','2GB RAM','HDMI · USB'],
+  ean:'7705946480048',img:'https://drive.google.com/file/d/1jRHb7qGTS7ijFfNK5cSo_HrJgTKPoYkI/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY K-TV32GQ200 FHD QLED',
+  desc:'QLED Full HD con Google TV, HDR10, más de 10,000 apps, control por voz y Bluetooth. Colores más vibrantes gracias a la tecnología de puntos cuánticos. Perfecto para dormitorios, cocinas y negocios pequeños.',
+  specs:['32" QLED FHD','Google TV','HDR10','10,000+ apps','Control por voz','BT · USB · HDMI'],
+  ean:'7705946476911',img:'https://drive.google.com/file/d/1q7nFNtv46vEpiBA5jaPpVQIboWYwEAXN/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY K-TV40GQ200 FHD QLED',
+  desc:'QLED Full HD de 40" con Google TV, HDR10, más de 10,000 apps, control por voz y Bluetooth. Tecnología de puntos cuánticos para colores más vivos y mejor contraste. Diseño frameless para espacios modernos.',
+  specs:['40" QLED FHD','Google TV','HDR10','10,000+ apps','Control por voz','BT · USB · HDMI'],
+  ean:'7705946480314',img:'https://drive.google.com/file/d/1nRmXnEHaOyPix7UbTIw57DOBM4Vd3T08/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY K-TV43GQ200 FHD QLED',
+  desc:'QLED Full HD de 43" con Google TV, HDR10, Dolby Audio, más de 10,000 apps, control por voz y Bluetooth. Tecnología de puntos cuánticos para colores más vivos y mejor contraste. El tamaño ideal para salas pequeñas.',
+  specs:['43" QLED FHD','Google TV','HDR10 · Dolby Audio','10,000+ apps','Control por voz','BT · USB · HDMI'],
+  ean:'7705946476928',img:'https://drive.google.com/file/d/1pSY2H9b3O0A3l90wL0hDx2Ays_GJ7Qru/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 50" K-TV50GQ405 QLED',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Colores más vivos y definición superior para salas medianas.',
+  specs:['50" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946479707',img:'https://drive.google.com/file/d/1RpN9D6N6Shz3VaXjrxpb1BMmqrMh1ZQv/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 55" K-TV55GQ405 QLED',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Imágenes vibrantes y colores reales para salas medianas.',
+  specs:['55" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946479714',img:'https://drive.google.com/file/d/1FVQXAOTYo5_aG_JpH2HlXQMIt0vwExl6/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 58" K-TV58GQ400AQLED',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Pantalla de 58" para salas amplias con imagen premium.',
+  specs:['58" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946480864',img:'https://drive.google.com/file/d/1wJA05IKfHtOQlrf-dyop8rI33rpHuLRW/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 65" K-TV65GQ405 QLED',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Pantalla grande con tecnología QLED para salas amplias.',
+  specs:['65" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946479806',img:'https://drive.google.com/file/d/1FH317D6xvLurmAhiijZWczie4v-gGVa4/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 70" K-TV70GQ405 QLED',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Formato gigante de 70" para experiencias de cine en casa.',
+  specs:['70" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946479738',img:'https://drive.google.com/file/d/1jYu0DhNCIU6i-CdMoEvKIs5nfYt1UlRW/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 75" K-TV75GQ405 QLED',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Formato gigante de 75" para salas de alto impacto.',
+  specs:['75" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946479745',img:'https://drive.google.com/file/d/1PEBXwMvOI5mUE18OBVDATNdD2sEX2jjX/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY K-TV75GQ415 QLED 4K',
+  desc:'QLED 4K UHD con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Versión alternativa del GQ405 con las mismas prestaciones premium.',
+  specs:['75" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946480604',img:'https://drive.google.com/file/d/1NNdVa6VLV6QRoclpt35YpgyLpOe8D9Ps/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY 85" K-TV85GQ405 QLED',
+  desc:'QLED 4K UHD de 85" con Google TV, Dolby Vision/Atmos, 120 Hz, modo juego e IA que mejora color y contraste. Bluetooth, USB y HDMI. Pantalla masiva para vitrinas y salas de cine en casa.',
+  specs:['85" QLED 4K','120 Hz','Dolby Vision · Atmos','Google TV · IA','Modo Juego','BT · USB · HDMI'],
+  ean:'7705946479813',img:'https://drive.google.com/file/d/1MVmVLBB1Hv-UwzgcP71TYj0Gor6ViX5t/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY ROKU TV 32"HD',
+  desc:'LED HD con sistema Roku TV: más de 5,000 canales y apps, 3 puertos HDMI, 16W de audio, USB y Wi-Fi. El sistema más fácil de usar para todos en la casa. Perfecto para dormitorios y negocios pequeños.',
+  specs:['32" LED HD','Roku TV','5,000+ canales','16W Audio','3 HDMI · USB','Wi-Fi'],
+  ean:'7705946478663',img:'https://drive.google.com/file/d/1Bt9CK0UegR-ePmyIWjBII3RwLE7r2rh7/view?usp=drive_link'},
+ {cat:'televisores',marca:'Kalley',nombre:'TV KALLEY K-TV32B100 HD',
+  desc:'LED HD básico con HDMI, USB y TDT. Imágenes con gran contraste y excelente calidad. Usa tu TV como reproductor multimedia desde USB. Perfecto para cocinas, habitaciones y negocios con presupuesto ajustado.',
+  specs:['32" LED HD','HDMI · USB','TDT','Reproductor multimedia','Diseño compacto','Básico'],
+  ean:'7705946476881',img:'https://drive.google.com/file/d/1hgSKR9QGN0LJSo-7rZCI_80KOzVDtDOT/view?usp=drive_link'},
+ /* ===== LG TV ===== */
+ {cat:'televisores',marca:'LG',nombre:'TV LG 100" 100QNED86 MiniLed4K magic control',
+  desc:'MiniLED 4K de 100" con 100% Color Volume, procesador AI Gen2, Dynamic QNED Color Pro y Precision Dimming Pro. 144 Hz con Motion Booster 288, webOS con IA y Copilot, Magic Remote incluido. La pantalla más grande de LG para experiencias cinematográficas masivas.',
+  specs:['100" MiniLED 4K','100% Color Volume','AI Gen2 · 144 Hz','webOS IA · Copilot','Magic Remote','HDR10 Pro'],
+  ean:'8806096525135',img:'https://drive.google.com/file/d/1vJ-B-TODkHXCzAUpqOFi-QuNKcfW67h5/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 100" 100QNED85B MiniLD4K magic control',
+  desc:'MiniLED 4K de 100" con 100% Color Volume, procesador Alpha 8 Gen3, Dynamic QNED Color Pro y Precision Dimming Pro. 144 Hz nativos con Motion Booster 288, webOS 26 IA con Copilot, Magic Remote incluido. Tecnología premium para salas de cine en casa.',
+  specs:['100" MiniLED 4K','Alpha 8 Gen3 · 144 Hz','100% Color Volume','webOS 26 IA · Copilot','Magic Remote','HDMI 2.1'],
+  ean:'8806096675847',img:'https://drive.google.com/file/d/1sRK-PsjYX6apPVc6CbdChig3g7rJVfF6/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 65" 65QNED73ASC + Barra S20 magic control',
+  desc:'QNED 4K de 65" con Dynamic QNED Color, procesador Alpha 7 AI Gen8, Dynamic Tone Mapping y HDR10 Pro. webOS con IA, sonido envolvente AI Pro y Magic Remote incluido. Incluye barra de sonido LG S20 para audio premium. Perfecto para salas amplias.',
+  specs:['65" QNED 4K','Alpha 7 AI Gen8','Dynamic Tone Mapping','webOS IA · Magic Remote','HDR10 Pro','+ Barra S20'],
+  ean:'8806096756126',img:'https://drive.google.com/file/d/1GyTAW5H1IrEXD_2EYrZLimmmT2jHs8Dw/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 55" 55QNED70ASA 4K-UHD magic control',
+  desc:'QNED 4K de 55" con Dynamic QNED Color, procesador Alpha 7 AI 4K Gen8, Dynamic Tone Mapping y HDR10 Pro. webOS con IA, sonido envolvente y Magic Remote incluido. Colores vibrantes y contraste mejorado para salas medianas.',
+  specs:['55" QNED 4K','Alpha 7 AI Gen8','Dynamic Tone Mapping','webOS IA · Magic Remote','HDR10 Pro','Sonido AI'],
+  ean:'8806096458297',img:'https://drive.google.com/file/d/109bSpkyTTtSYTkwYAy3lrYQIsBBQlxXb/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 50" 50QNED73ASA 4KUHD magic control',
+  desc:'QNED 4K de 50" con Dynamic QNED Color, procesador Alpha 7 AI Gen8, Dynamic Tone Mapping y HDR10 Pro. webOS con IA, sonido AI Pro y Magic Remote incluido. El tamaño ideal para salas pequeñas con imagen premium.',
+  specs:['50" QNED 4K','Alpha 7 AI Gen8','Dynamic Tone Mapping','webOS IA · Magic Remote','HDR10 Pro','Sonido AI Pro'],
+  ean:'8806096609460',img:'https://drive.google.com/file/d/1aHUHCWyCrrncmwoCmJzKYA8VqmCxHdRs/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 55" 55UA8055PSA 4KUHD magic control',
+  desc:'UHD 4K de 55" con HDR10 Pro, procesador Alpha 7 4K AI Gen8, sonido envolvente y webOS 2025. Modo juego HGIG con optimizador de juegos, Magic Remote incluido. Colores y detalles impresionantes para salas medianas.',
+  specs:['55" UHD 4K','Alpha 7 AI Gen8','HDR10 Pro','webOS 2025 · Magic Remote','Modo Juego HGIG','Sonido envolvente'],
+  ean:'8806096627006',img:'https://drive.google.com/file/d/1MF-OgSYYRVS8FYnW0kgKadZKL4zomrx5/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 65" 65UA8055PSA 4KUHD magic control',
+  desc:'UHD 4K de 65" con HDR10 Pro, procesador Alpha 7 4K AI Gen8, sonido envolvente y webOS 2025. Modo juego HGIG con optimizador de juegos, Magic Remote incluido. Pantalla grande para salas amplias con imagen mejorada.',
+  specs:['65" UHD 4K','Alpha 7 AI Gen8','HDR10 Pro','webOS 2025 · Magic Remote','Modo Juego HGIG','Sonido envolvente'],
+  ean:'8806096626986',img:'https://drive.google.com/file/d/1F5czUxpVvQon09TXrkRLKHcVBL_K6vo4/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 43" 43NU850BPSC 4KUHD',
+  desc:'NanoCell 4K de 43" con Nano Detail Enhancer, procesador Alpha 7 AI 4K Gen9, HDR10/HLG y Filmmaker Mode. webOS 26 IA con Copilot, 60 Hz y diseño Linear Flow. Perfecto para habitaciones y espacios pequeños con colores precisos.',
+  specs:['43" NanoCell 4K','Alpha 7 AI Gen9','Nano Detail Enhancer','webOS 26 IA · Copilot','HDR10/HLG','60 Hz'],
+  ean:'8806096734179',img:'https://drive.google.com/file/d/1sTL0pgrs4ONJHBmpzJlgfalycyCp_9ch/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 50" 50NU850BPSC 4KUHD',
+  desc:'NanoCell 4K de 50" con Nano Detail Enhancer, procesador Alpha 7 AI 4K Gen9, HDR10/HLG y Filmmaker Mode. webOS 26 IA con Copilot, 60 Hz y diseño Linear Flow. El tamaño ideal para salas pequeñas con tecnología NanoCell.',
+  specs:['50" NanoCell 4K','Alpha 7 AI Gen9','Nano Detail Enhancer','webOS 26 IA · Copilot','HDR10/HLG','60 Hz'],
+  ean:'8806096702451',img:'https://drive.google.com/file/d/19Q33UekhLxf-aH2Ud7eKltUGvpMK4_bs/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 55" 55NU850BPSA 4KUHD',
+  desc:'NanoCell 4K de 55" con Nano Detail Enhancer, procesador Alpha 7 AI 4K Gen9, HDR10/HLG y Filmmaker Mode. webOS 26 IA con Copilot, 60 Hz y diseño Linear Flow. Pantalla mediana con colores precisos y textura refinada.',
+  specs:['55" NanoCell 4K','Alpha 7 AI Gen9','Nano Detail Enhancer','webOS 26 IA · Copilot','HDR10/HLG','60 Hz'],
+  ean:'8806096721353',img:'https://drive.google.com/file/d/1sq-h_IhTIDyonKWKOP6znN81oTsVdRBD/view?usp=drive_link'},
+ {cat:'televisores',marca:'LG',nombre:'TV LG 65" 65NU855BPSA 4KUHD magic control',
+  desc:'NanoCell 4K de 65" con Nano Detail Enhancer, procesador Alpha 7 AI 4K Gen9, HDR10/HLG y Filmmaker Mode. webOS 26 IA con Copilot, AI Hub para personalización, Magic Remote incluido. Pantalla grande con tecnología NanoCell para salas amplias.',
+  specs:['65" NanoCell 4K','Alpha 7 AI Gen9','Nano Detail Enhancer','webOS 26 IA · Magic Remote','HDR10/HLG','AI Hub'],
+  ean:'8806096701201',img:'https://drive.google.com/file/d/1nkRwcDJC4ljCeiig53oXNAtU1PryEz67/view?usp=drive_link'},
+ /* ===== SAMSUNG NEVERAS ===== */
+ {cat:'neveras',marca:'Samsung',nombre:'Nevera Congelador Superior All Around Cooling 236L',
+  desc:'Nevera Samsung de 236L con congelador superior, tecnología All Around Cooling que distribuye el frío de forma uniforme, Digital Inverter para ahorro energético, filtro libre de olores y bandejas de cristal templado. Eficiencia energética C con consumo de 29.8 kWh/mes.',
+  specs:['236L Total','All Around Cooling','Digital Inverter','Filtro libre de olores','Cristal templado','29.8 kWh/mes'],
+  ean:'8806092127500',
+  img:'https://drive.google.com/file/d/1E_32aG1SfcWvwizc7MqIna_H1r2jDrwk/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1ROLPV0IGycVJBqsg-nUCXWuyHRjAArEm/view?usp=drive_link'},
+ {cat:'neveras',marca:'Samsung',nombre:'Nevera Congelador Superior All Around Cooling 256L',
+  desc:'Nevera Samsung de 256L con congelador superior, All Around Cooling para distribución uniforme del frío, Digital Inverter que ajusta automáticamente la velocidad, luz LED eficiente y desodorizante integrado. Mayor capacidad para familias pequeñas.',
+  specs:['256L Total','All Around Cooling','Digital Inverter','Luz LED eficiente','Desodorizante','Eficiencia C'],
+  ean:'8806092127517',
+  img:'https://drive.google.com/file/d/1eYQ_xLS11BzGv__gp8tgVNgnH1V9310n/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1LQpCNYuMolkPufMI11N9C-EWOj_pl3i3/view?usp=drive_link'},
+ {cat:'neveras',marca:'Samsung',nombre:'Nevera Congelador Superior SpaceMax™ 301L',
+  desc:'Nevera Samsung de 301L con tecnología SpaceMax™ que optimiza el espacio interior sin aumentar las dimensiones externas. Congelador superior de 68L, AI Energy Mode, WiFi con SmartThings para control desde el celular. Consumo de 32 kWh/mes.',
+  specs:['301L Total','SpaceMax™','AI Energy Mode','WiFi · SmartThings','68L Congelador','32 kWh/mes'],
+  ean:'8806095362991',
+  img:'https://drive.google.com/file/d/1GFF2WogCUY4nHZ7vKsU5CJEdAE9afyfz/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1vob6jW4VZ9m5YiAcCuDoNb2wnpkUZyAJ/view?usp=drive_link'},
+ {cat:'neveras',marca:'Samsung',nombre:'Nevera Congelador Superior Modo AI Energy 389L',
+  desc:'Nevera Samsung de 389L con Modo AI Energy que reduce el consumo hasta un 10% mediante SmartThings. Congelador superior, Digital Inverter, filtro libre de olores y bandejas de cristal templado. Eficiencia energética B con 35.5 kWh/mes.',
+  specs:['389L Total','AI Energy Mode','SmartThings WiFi','Digital Inverter','Eficiencia B','35.5 kWh/mes'],
+  ean:'8806095363264',
+  img:'https://drive.google.com/file/d/1tdauSVR9qXWyliLVLs-tVpVbiqtqUvIz/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1w80um9v7GkAVERjMGk96ErXAeKjyUczt/view?usp=drive_link'},
+ {cat:'neveras',marca:'Samsung',nombre:'Nevera Congelador Superior Optimal Fresh+ 520L',
+  desc:'Nevera Samsung de 520L con cajón Optimal Fresh+ que permite 4 modos de temperatura (congelación suave, conservador, etc.). Dispensador de agua, Power Cool para enfriamiento rápido, AI Energy Mode y WiFi con SmartThings. La capacidad ideal para familias grandes.',
+  specs:['520L Total','Optimal Fresh+ 4 modos','Dispensador agua','Power Cool','SmartThings WiFi','Eficiencia B'],
+  ean:'8806095363875',
+  img:'https://drive.google.com/file/d/1eATtbwwAn4u5SJhriTGG4Jc4Thi2PNJU/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1N9wMj6EUNllcbDktCORDW_538yxYVAL4/view?usp=drive_link'},
+ {cat:'neveras',marca:'Samsung',nombre:'Nevera Congelador Inferior Smart Sensor System 427L',
+  desc:'Nevera Samsung de 427L con congelador inferior tipo europeo. Smart Sensor System con 5 sensores inteligentes que optimizan el consumo, Modo AI Energy, Counter Depth (menor profundidad) y All Around Cooling. Perfecta para cocinas modernas.',
+  specs:['427L Total','Congelador Inferior','Smart Sensor System','5 sensores inteligentes','Counter Depth','All Around Cooling'],
+  ean:'8806097697367',
+  img:'https://drive.google.com/file/d/1i98hk9zehDk2lx2k_yqF5usicl8-5uAR/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1j7mOp9FT3Nqq-b11Krz6TN8Zo4ZNZp7u/view?usp=drive_link'},
+ /* ===== HACEB NEVERAS ===== */
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB Frost Congelador Superior 206L Manija Integrada',
+  desc:'Nevera Haceb Frost de 206L con congelador superior de 37L, manija integrada en color negro. Sistema convencional con escarcha, descongelamiento semiautomático, luz LED interior y control de temperatura por perilla. Consumo eficiente de 21.9 kWh/mes.',
+  specs:['206L Total','Frost · Semiautomático','37L Congelador','Manija Integrada','Luz LED','21.9 kWh/mes'],
+  ean:'7704353484939',
+  img:'https://drive.google.com/file/d/1ZwamWkivFvGa0btHF2mTWYL_3Wy5f_jr/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1N0R9GqLgZlnwOKM6gLZ33gfOg9BvD86n/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera Haceb Frost 220L Manija Integrada Titanio',
+  desc:'Nevera Haceb Frost de 220L en color titanio con manija integrada. Sistema convencional con corrientes de frío optimizadas, descongelamiento semiautomático, indicador de escarcha, luz LED de bajo consumo y amplio espacio interior modular.',
+  specs:['220L Total','Frost · Semiautomático','Indicador escarcha','Manija Integrada','Luz LED','Espacio modular'],
+  ean:'7704353446098',
+  img:'https://drive.google.com/file/d/16WQCa93RGHR37ESr0rOFYjB05VGuV_Lb/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1SLqUOOkxdKB_VeZWM4fH_RfkFgJy58Y1/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 226L Dispensador Manija Integrada Inverter N243',
+  desc:'Nevera Haceb No Frost de 226L (161L refrigerador + 65L congelador) con dispensador de agua y manija integrada. Motor Inverter que ahorra hasta 67% de energía, eficiencia A, función Dual (refrigera/congela) y luz LED de gran alcance.',
+  specs:['226L Total','No Frost','Inverter · Ahorro 67%','Dispensador agua','Eficiencia A','Función Dual'],
+  ean:'7704353474985',
+  img:'https://drive.google.com/file/d/1BlXHxRomd3d8I46SRZsKU302P_OzkC2P/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1xXn5hLL7XnQasjWYFdZt7nVzi15A85zm/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 226L Dispensador Manija Externa Inverter N243',
+  desc:'Nevera Haceb No Frost de 226L en negro cósmico con dispensador de agua y manija externa. Motor Inverter silencioso y eficiente, eficiencia energética A, iluminación LED de gran alcance y amplio espacio interior para organizar fácilmente.',
+  specs:['226L Total','No Frost','Inverter · Silencioso','Dispensador agua','Manija Externa','Eficiencia A'],
+  ean:'7704353475029',
+  img:'https://drive.google.com/file/d/1Z83Gtn0jp-sadqpKUD5TtXX1R0yT7hCw/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Y1FOIWtiSjGw8jICaPOGoEw7Fb_HiT6G/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 254L Dispensador Manija Externa Inverter N271',
+  desc:'Nevera Haceb No Frost de 254L (171L refrigerador + 83L congelador) con dispensador de agua y manija externa en negro cósmico. Motor Inverter, eficiencia A, iluminación LED de gran alcance y fabricador de hielo. Consumo de 23.7 kWh/mes.',
+  specs:['254L Total','No Frost','Inverter · Eficiente','Dispensador agua','Manija Externa','23.7 kWh/mes'],
+  ean:'7704353475012',
+  img:'https://drive.google.com/file/d/1Z83Gtn0jp-sadqpKUD5TtXX1R0yT7hCw/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Y1FOIWtiSjGw8jICaPOGoEw7Fb_HiT6G/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera Haceb No Frost 254L Dispensador Manija Interna N271',
+  desc:'Nevera Haceb No Frost de 254L con dispensador de agua y manija interna. Tecnología No Frost que evita la escarcha, amplio espacio interior, iluminación LED de gran alcance y fabricador de hielos más grandes. Perfecta para familias medianas.',
+  specs:['254L Total','No Frost','Dispensador agua','Manija Interna','Luz LED','Fabricador hielo'],
+  ean:'7704353459562',
+  img:'https://drive.google.com/file/d/1MUsWUrA6LTy1IaKjf8DKbuDtfyuBhVhm/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1oa7GiKU9AEjyKjqzceCRWF5LA9KQfNna/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 294L Dispensador Manija Integrada Inverter Inox',
+  desc:'Nevera Haceb No Frost de 294L (229L refrigerador + 65L congelador) con dispensador de agua y manija integrada en acero inox. Motor Inverter eficiente, sistema de conservación Himalaya, alarma de puerta abierta y panel digital interno.',
+  specs:['294L Total','No Frost','Inverter · Eficiente','Dispensador agua','Sistema Himalaya','Alarma puerta'],
+  ean:'7704353472219',
+  img:'https://drive.google.com/file/d/1c2nWhWQ8uXs8maDonmE3X76wjreR92OM/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1F8UvAislamqEXucgXEK4omhjQJC0iqcX/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 294L N311 Manija Interna Titanio',
+  desc:'Nevera Haceb No Frost de 294L en color titanio con manija interna. Tecnología No Frost, amplio espacio interior, iluminación LED, fabricador de hielo y control de temperatura. Consumo de 33.6 kWh/mes con eficiencia B.',
+  specs:['294L Total','No Frost','Manija Interna','Luz LED','Fabricador hielo','33.6 kWh/mes'],
+  ean:'7704353446197',
+  img:'https://drive.google.com/file/d/1kmo7VwStpKiw5P6JbW6SbnawmHfNZ7YG/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1f_7dvPmZ9DwyxNBLei2A6NLsmGqeoy6U/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 294L Dispensador Manija Externa Inverter N311',
+  desc:'Nevera Haceb No Frost de 294L en negro cósmico con dispensador de agua y manija externa. Motor Inverter que ahorra energía, sistema Himalaya de conservación avanzada, alarma de puerta abierta y eficiencia energética A. Consumo de 25.2 kWh/mes.',
+  specs:['294L Total','No Frost','Inverter · Ahorro','Dispensador agua','Sistema Himalaya','25.2 kWh/mes'],
+  ean:'7704353475036',
+  img:'https://drive.google.com/file/d/1JLrAQDDb3hTPyXXICARQKY96t-ldRGl6/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1v2wCRt5J-8KHXDS6kLYpz27nL1iRIf2A/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera Haceb No Frost 391L N404 Manija Integrada Panel Digital Inox',
+  desc:'Nevera Haceb No Frost de 391L en acero inoxidable con manija integrada y panel digital interno. Motor Inverter silencioso, sistema Himalaya de conservación, iluminación LED frontal en congelador y nevera, y control de temperatura preciso.',
+  specs:['391L Total','No Frost','Inverter · Silencioso','Panel digital','Sistema Himalaya','LED frontal'],
+  ean:'7704353461398',
+  img:'https://drive.google.com/file/d/1PXqf1MOUNPHS_x7Akuy0exE6ET223xEd/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1y3rp0wfCRLAizXbM7KxHCoTGWpPFq-Wd/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 391L N404 Manija Integrada Dispensador Negro',
+  desc:'Nevera Haceb No Frost de 391L en negro esmeralda con dispensador de agua de 3L libre de goteos y manija integrada. Motor Inverter eficiente, sistema Himalaya de conservación, enfriamiento rápido y amplio espacio interior.',
+  specs:['391L Total','No Frost','Inverter · Eficiente','Dispensador 3L','Sistema Himalaya','Enfriamiento rápido'],
+  ean:'7704353462319',
+  img:'https://drive.google.com/file/d/1_45O8p_YwmeUPYYhNs-Yg-tlceYqJ2o5/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1D-lztPyFs4J5dqJmxr7hJBwhSa9zggQY/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 391L N404 Manija Externa Dispensador Titanio',
+  desc:'Nevera Haceb No Frost de 391L en gris titanio con dispensador de agua y manija externa. Motor Inverter eficiente, sistema Himalaya, panel digital interno para control de temperatura y eficiencia energética A. Consumo de 30.3 kWh/mes.',
+  specs:['391L Total','No Frost','Inverter · Eficiente','Dispensador agua','Manija Externa','30.3 kWh/mes'],
+  ean:'7704353462326',
+  img:'https://drive.google.com/file/d/1cLw0AwT2d51zem1Z1jQB1gTuXt1nufF4/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1ql6Dygx7a_SfJk_cW0ajnCaVjqMivBbD/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera Haceb No Frost 404L Manija Integrada Gris Plomo',
+  desc:'Nevera Haceb No Frost de 404L brutos (391L netos) en gris plomo con manija integrada. Tecnología No Frost que evita la escarcha, iluminación LED, altura variable en estantes y amplio espacio interior para ordenar fácilmente.',
+  specs:['404L Brutos','No Frost','Manija Integrada','Luz LED','Altura variable','Espacio amplio'],
+  ean:'7704353458428',
+  img:'https://drive.google.com/file/d/1Fu_xOcNrs7SmQwobHZeFO2EVPOpniu3Y/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1C7NsYKvLTVZMJxdBegCsmXeRX3dUilsb/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera HACEB No Frost 428L N448 Manija Integrada Dispensador Titanio',
+  desc:'Nevera Haceb No Frost de 428L (321L refrigerador + 107L congelador) con dispensador de agua y manija integrada en gris titanio. Motor Inverter eficiente, sistema Himalaya, hielos 60% más grandes y panel digital interno. Eficiencia A.',
+  specs:['428L Total','No Frost','Inverter · Eficiente','Dispensador agua','Hielos 60% más grandes','Eficiencia A'],
+  ean:'7704353458336',
+  img:'https://drive.google.com/file/d/1lgcoUtIBqoJm2HFi_k7cvKMaiwQPwBjR/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1rBGbcmz-xeZhSx7b-LPxE_ahIzWZZ9ZB/view?usp=drive_link'},
+ {cat:'neveras',marca:'Haceb',nombre:'Nevera Haceb No Frost 448L Manija Externa Negro Esmeralda',
+  desc:'Nevera Haceb No Frost de 448L brutos (428L netos) en negro esmeralda con manija externa. Tecnología No Frost, motor Inverter que optimiza el consumo y reduce el ruido, sistema Himalaya de conservación avanzada. La capacidad más grande de la línea Haceb.',
+  specs:['448L Brutos','No Frost','Inverter · Silencioso','Manija Externa','Sistema Himalaya','Gran capacidad'],
+  ean:'7704353458398',
+  img:'https://drive.google.com/file/d/1t0eJFbsIFWFPRetijF4yirAeVzFkv740/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/14el7YHd6D-4r2_x1BrjNELqGUY3GvjQ7/view?usp=drive_link'},
+ /* ===== ELECTROLUX NEVERAS ===== */
+ {cat:'neveras',marca:'Electrolux',nombre:'Nevera Electrolux Congelador Inferior Frost 173L Compacta Negra ERB163HB',
+  desc:'Nevera Electrolux compacta de 173L con congelador inferior, ideal para espacios reducidos (50cm ancho). Sistema Frost con descongelamiento manual, puerta reversible, porta botellas y control de temperatura. Eficiencia energética B con consumo de 24.5 kWh/mes.',
+  specs:['173L Total','Frost · Congelador Inferior','50cm Ancho Compacto','Puerta Reversible','Eficiencia B','24.5 kWh/mes'],
+  ean:'7909569469194',
+  img:'https://drive.google.com/file/d/1ykhKEX4Mom6ooJltNv1Y8NkGSXPSh7w_/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1yQEUzo-CFSbxBwwZE6n_91q_lZbMcYAa/view?usp=drive_link'},
+ {cat:'neveras',marca:'Electrolux',nombre:'Nevera Electrolux IW43S 389L Inverter No Frost Gris',
+  desc:'Nevera Electrolux de 389L con tecnología Inverter que ahorra hasta 42% de energía y mantiene temperatura estable. Sistema No Frost, dispensador de agua en la puerta, bandejas de vidrio templado y eficiencia energética A. Iluminación LED interna.',
+  specs:['389L Total','Inverter · Ahorro 42%','No Frost','Dispensador agua','Vidrio templado','Eficiencia A'],
+  ean:'7909569438459',
+  img:'https://drive.google.com/file/d/18PsjFRJ9mgy8C3SIZHnoUkgz1e4IhHDL/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1vWiqOMr2wMjT9zWvWfj1RkMsPA2aEImv/view?usp=drive_link'},
+ {cat:'neveras',marca:'Electrolux',nombre:'Nevera Electrolux IW45S 409L Inverter No Frost Gris',
+  desc:'Nevera Electrolux de 409L con tecnología Inverter y AutoSense que ajusta la temperatura automáticamente, ahorrando hasta 30% de energía. Sistema No Frost, dispensador de agua, sensor inteligente y amplio espacio interior (292L refrigerador + 117L congelador).',
+  specs:['409L Total','Inverter · AutoSense','No Frost','Dispensador agua','Sensor inteligente','Ahorro 30%'],
+  ean:'7909569438510',
+  img:'https://drive.google.com/file/d/1J7nLGI2HQw34y14qmPzkSqjEu9wxyii2/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Q3B02rWX6IUXT9z1bDJOSEFq7o1jpnW7/view?usp=drive_link'},
+ {cat:'neveras',marca:'Electrolux',nombre:'Nevera Electrolux Congelador Inferior No Frost 323L Inverter Negro ERBB32N3HXB',
+  desc:'Nevera Electrolux de 323L con congelador inferior, tecnología Inverter + AutoSense con inteligencia artificial que prolonga la frescura de los alimentos hasta 30%. Sistema No Frost, Turbo Freezer para congelación rápida y consumo eficiente de 26.4 kWh/mes.',
+  specs:['323L Total','Inverter + IA AutoSense','No Frost · Bottom Freezer','Turbo Freezer','Frescura +30%','26.4 kWh/mes'],
+  ean:'7909569446737',
+  img:'https://drive.google.com/file/d/12tHSmUcHDN4Ev6XdF8z8p47B4YMXlzlF/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/11Q_oqt2QQz792lCP8eUQRpZ2CqJncfyC/view?usp=drive_link'},
+ /* ===== LG NEVERAS ===== */
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 212L Plata Mate LinearCooling',
+  desc:'Nevera LG de 212L con tecnología LinearCooling™ que reduce las fluctuaciones de temperatura para mantener los alimentos frescos por más tiempo. Multi Air Flow para distribución uniforme del aire, bandejas de vidrio templado resistente y compresor Smart Inverter.',
+  specs:['212L Total','LinearCooling™','Multi Air Flow','Vidrio templado','Smart Inverter','Plata Mate'],
+  ean:'8806096495742',
+  img:'https://drive.google.com/file/d/1Guk855ygRhbPVvARkppQaqDnusloA91m/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1kR-N090f1vKSbPWHcqCehm-V92-x4eIl/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera Congelador Superior LG 243L Plata Mate LinearCooling',
+  desc:'Nevera LG de 243L con LinearCooling™ para temperatura constante, Multi Air Flow que distribuye el aire frío uniformemente y compresor Smart Inverter con 10 años de garantía. Bandejas de vidrio templado, iluminación LED y diseño en plata mate elegante.',
+  specs:['243L Total','LinearCooling™','Multi Air Flow','Smart Inverter 10 años','Vidrio templado','LED'],
+  ean:'8806096557631',
+  img:'https://drive.google.com/file/d/1EDo4PAJxtydGyKxdZM9ArPsG-2WvQpQv/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1RDylK692c8_tdWA2EVvI2qxJNrqtzhL3/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 262L Plata DoorCooling',
+  desc:'Nevera LG de 262L con tecnología DoorCooling+™ que enfría más rápido y uniforme desde la puerta, manteniendo frescos los alimentos por más tiempo. Compresor Smart Inverter con 10 años de garantía, Multi Air Flow y bandejas de vidrio templado.',
+  specs:['262L Total','DoorCooling+™','Smart Inverter 10 años','Multi Air Flow','Vidrio templado','Plata'],
+  ean:'8806084221537',
+  img:'https://drive.google.com/file/d/1aLpeHfIzgKLI85ec-S1Kk6BAGIL0oPbk/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1MpTaRhVCKuh3slpeIkNZtDgZeDyMvYhg/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG 264L Negro Mate LinearCooling',
+  desc:'Nevera LG de 264L en negro mate con LinearCooling™ que mantiene temperatura constante para frescura prolongada. Multi Air Flow, compresor Smart Inverter eficiente, bandejas de vidrio templado y diseño moderno que combina con cualquier cocina.',
+  specs:['264L Total','LinearCooling™','Multi Air Flow','Smart Inverter','Vidrio templado','Negro Mate'],
+  ean:'8806096042748',
+  img:'https://drive.google.com/file/d/13uc5QPO5OMcw8kdbTWamW6tBQxjykiAt/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1z20ok4lW22o_0HGw8tEFOEnjUFF3WHzV/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 314L Plata Mate DoorCooling',
+  desc:'Nevera LG de 314L con DoorCooling+™ para enfriamiento rápido y uniforme desde la puerta. LinearCooling™ reduce fluctuaciones de temperatura, Moist Pull-out-tray para frutas y verduras, compresor Smart Inverter con 10 años de garantía.',
+  specs:['314L Total','DoorCooling+™','LinearCooling™','Moist Pull-out-tray','Smart Inverter 10 años','Plata Mate'],
+  ean:'8806096171059',
+  img:'https://drive.google.com/file/d/1JcmdvLtQYG0LgHJYXxVhrhQ18oItUDbP/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1A-wx8fZXXYHCLuUxeBhyYx_ijSggpOiF/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 334L Plata DoorCooling',
+  desc:'Nevera LG de 334L con DoorCooling+™ que mantiene los alimentos frescos incluso desde la puerta. Compresor Smart Inverter, Multi Air Flow, cajón de frutas y verduras con control de humedad, bandejas de vidrio templado y iluminación LED.',
+  specs:['334L Total','DoorCooling+™','Smart Inverter','Multi Air Flow','Cajón control humedad','Vidrio templado'],
+  ean:'8806084221490',
+  img:'https://drive.google.com/file/d/1WyKdJZwbmVxAAw7QGyMGzqVi7_7xzlvJ/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1y2VyDrRNwY8HF02i4aWkTjv2IP9p4elC/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 374L Negro Mate DoorCooling',
+  desc:'Nevera LG de 374L en negro mate con DoorCooling+™ para frescura uniforme en toda la nevera. Compresor Smart Inverter con 10 años de garantía, Multi Air Flow, cajón Moist Balance Crisper para frutas y verduras, bandejas de vidrio templado.',
+  specs:['374L Total','DoorCooling+™','Smart Inverter 10 años','Moist Balance Crisper','Multi Air Flow','Negro Mate'],
+  ean:'8806096042663',
+  img:'https://drive.google.com/file/d/1DwpGibdhTWMLtiUXeME7FPmvfW1tBxrm/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1LLNA3imj-lpCec5-ZI0NIJ6BmEjRLV-1/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 394L Plata Mate DoorCooling',
+  desc:'Nevera LG de 394L en plata mate con DoorCooling+™ que enfría más rápido desde la puerta. LinearCooling™ para temperatura constante, compresor Smart Inverter eficiente, amplio espacio interior (235L refrigerador + 79L congelador) y bandejas de vidrio templado.',
+  specs:['394L Total','DoorCooling+™','LinearCooling™','Smart Inverter','Vidrio templado','Plata Mate'],
+  ean:'8806096013700',
+  img:'https://drive.google.com/file/d/1I8XTNzqlo0SPZs6cdzMVH79V100YYNGW/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1eKgv8FV1h4JZ1-g1AybnBTeA9h1S47nX/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Superior 394L Negro Mate DoorCooling',
+  desc:'Nevera LG de 394L en negro mate con DoorCooling+™ para frescura uniforme. Compresor Smart Inverter con 10 años de garantía, LinearCooling™, Multi Air Flow, cajón para frutas y verduras con control de humedad y diseño elegante moderno.',
+  specs:['394L Total','DoorCooling+™','Smart Inverter 10 años','LinearCooling™','Cajón control humedad','Negro Mate'],
+  ean:'8806096042618',
+  img:'https://drive.google.com/file/d/1nKHPlBB13VgNMJvm3hNZcyiD74PRPZF6/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/19w2iYx58coztMnMYgO64SJfGFTjdggCw/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG 374L VT38WGPX Plata Door Cooling',
+  desc:'Nevera LG de 374L modelo VT38WGPX con DoorCooling+™ para enfriamiento rápido y uniforme. Tecnología Inverter Linear Compressor con 51% de ahorro energético, Multi Air Flow, iluminación LED y acabados en plata premium con diseño sofisticado.',
+  specs:['374L Total','DoorCooling+™','Inverter Linear 51% ahorro','Multi Air Flow','Iluminación LED','Plata Premium'],
+  ean:'8806084221469',
+  img:'https://drive.google.com/file/d/1cz9nchn6MNnnqGBcxE8knWt3yFQaU0kM/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1vihnJb5Os11WhKkXY94PHtA-k1IX0aSo/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Inferior 332L Negro Mate Disp. agua',
+  desc:'Nevera LG de 332L con congelador inferior tipo europeo y dispensador de agua exterior. Multi Air Flow para distribución uniforme, compresor Smart Inverter eficiente, cajón Moist Balance Crisper y diseño en negro mate elegante. Perfecta para cocinas modernas.',
+  specs:['332L Total','Congelador Inferior','Dispensador agua','Multi Air Flow','Smart Inverter','Moist Balance Crisper'],
+  ean:'8806096251621',
+  img:'https://drive.google.com/file/d/1pn5S1zk6utPm8ypNgbnf-W_XGoy3J-Db/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1gHfjJCcM1Mi6ZmeETIDIjIPu2IUQ7DYn/view?usp=drive_link'},
+ {cat:'neveras',marca:'LG',nombre:'Nevera LG Congelador Inferior 305L Negro Mate Disp. agua',
+  desc:'Nevera LG de 305L con congelador inferior y dispensador de agua en la puerta. Multi Air Flow para frescura uniforme, compresor Smart Inverter con bajo consumo, iluminación LED interior, cajón para frutas y verduras con control de humedad.',
+  specs:['305L Total','Congelador Inferior','Dispensador agua','Multi Air Flow','Smart Inverter','LED · Control humedad'],
+  ean:'8806091275769',
+  img:'https://drive.google.com/file/d/1gmQMch6fZMCV3fwxBHIqmWga-SMw4z2K/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1ODTTwlb1M6gnm4FoLatydDvIIT9FKXOl/view?usp=drive_link'},
+ /* ===== WHIRLPOOL NEVERAS ===== */
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera 234 litros Top Mount Gris- No Frost',
+  desc:'Nevera Whirlpool de 234L con congelador superior (Top Mount), sistema No Frost que evita la formación de escarcha y descongelamiento manual. Tecnología de enfriamiento 3D para distribución uniforme del frío, cajón con control de humedad para frutas y verduras.',
+  specs:['234L Total','Top Mount · No Frost','Enfriamiento 3D','Cajón control humedad','Luz LED','Gris'],
+  ean:'7704353383645',
+  img:'https://drive.google.com/file/d/1LfwxmfHXvCJuAIlPuJ4ecs2EiAN0amjU/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1BafOT9Rb3Kp5jONsvpOSZ6oaFazgNoex/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera 264 litros Top Mount Negro Onyx- Sin escarcha',
+  desc:'Nevera Whirlpool de 264L en negro ónix con congelador superior y sistema sin escarcha. Tecnología de enfriamiento 3D, cajón Fresh Zone con control de humedad para mantener frutas y verduras frescas por más tiempo, iluminación LED y diseño moderno.',
+  specs:['264L Total','Top Mount · Sin escarcha','Enfriamiento 3D','Fresh Zone','Luz LED','Negro Onyx'],
+  ean:'7704353475760',
+  img:'https://drive.google.com/file/d/19JVboxe35uHN6x4AyOGAaqoXROaJgvpx/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1nyiGp05Z9_ABuKVMkX7G3snklwf6IIA7/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera Whirlpool No Frost Congelador Superior 263 Litros WRW25CKTWW Gris',
+  desc:'Nevera Whirlpool de 263L modelo WRW25CKTWW con congelador superior y sistema No Frost. Tecnología de enfriamiento 3D para distribución uniforme, cajón con control de humedad, iluminación LED interior y dispensador de agua exterior. Eficiencia energética B.',
+  specs:['263L Total','Top Mount · No Frost','Enfriamiento 3D','Dispensador agua','Cajón control humedad','Luz LED'],
+  ean:'7704353383652',
+  img:'https://drive.google.com/file/d/1C1X73W-wEqtEupMJ_S1NwpwNBxPi_Skd/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1vH1dkeOxl7HmUhWRgERTuVVENU8Ry8ez/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera 286 litros Top Mount Xpert Flow Gris- No Frost',
+  desc:'Nevera Whirlpool de 286L con tecnología Xpert Flow que conserva la frescura con aire homogéneo en toda la nevera. Sistema No Frost, congelador superior, cajón con control de humedad para frutas y verduras, iluminación LED y consumo eficiente.',
+  specs:['286L Total','Xpert Flow','Top Mount · No Frost','Cajón control humedad','Luz LED','Aire homogéneo'],
+  ean:'7704353383669',
+  img:'https://drive.google.com/file/d/17j8fkxALz4vVXaGrx2nttQKtUg_EDQ3m/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1R-1tztLse6-a8rxe4oK1qO9pQBVkIZe1/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera 305 litros Top Mount Negro Onyx- Sin escarcha',
+  desc:'Nevera Whirlpool de 305L en negro ónix con congelador superior y sistema sin escarcha. Tecnología de enfriamiento 3D, dispensador de agua exterior, cajón Fresh Zone con control de humedad para frutas y verduras, iluminación LED y diseño elegante.',
+  specs:['305L Total','Top Mount · Sin escarcha','Enfriamiento 3D','Dispensador agua','Fresh Zone','Negro Onyx'],
+  ean:'7704353475784',
+  img:'https://drive.google.com/file/d/1uJCwUSkxk6wDy5OSrUgHtsn2JztJnjoq/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1c20cy4GZnF2AJzt8QRpdenuK24yDmIKh/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera 305 litros Top Mount No Frost Gris- No Frost',
+  desc:'Nevera Whirlpool de 305L en gris con congelador superior y sistema No Frost que evita la formación de escarcha. Tecnología de enfriamiento 3D para distribución uniforme del frío, dispensador de agua exterior, cajón con control de humedad y consumo de 34.4 kWh/mes.',
+  specs:['305L Total','Top Mount · No Frost','Enfriamiento 3D','Dispensador agua','Cajón control humedad','34.4 kWh/mes'],
+  ean:'7704353383676',
+  img:'https://drive.google.com/file/d/16o5IRnhLKyq6BH90KBjMjmYQTj7VtZ_9/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1UEwirBx3XfdlDvPzQk7GnEKsJ851EyA4/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera WHIRLPOOL No Frost Congelador Superior 245 Litros WT32409D Xpert Inverter Gris',
+  desc:'Nevera Whirlpool de 245L (9 pies cúbicos) con tecnología Xpert Inverter que ofrece 10 años de garantía en el compresor, operación silenciosa y ahorro energético. Sistema No Frost, dispensador de agua de 2.5L, Xpert Spaces para organización eficiente.',
+  specs:['245L Total','Xpert Inverter 10 años','No Frost','Dispensador 2.5L','Xpert Spaces','Silenciosa'],
+  ean:'8830497034972',
+  img:'https://drive.google.com/file/d/1vRJQRbsp7xwb1QaWaQrkD8Rs1vt4BOyh/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1PGzMzR7zZc3GEapbhEo9VrWeeGla4u-D/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera Whirlpool No Frost Congelador Superior 394 Litros WRJ43AKTWW Gris',
+  desc:'Nevera Whirlpool de 394L con tecnología Xpert Flow que conserva la frescura con aire homogéneo. Dispensador de agua de 4L para más agua sin abrir la puerta, Cold Room que mantiene carnes y lácteos perfectos, sistema No Frost y amplio espacio interior.',
+  specs:['394L Total','Xpert Flow','Dispensador 4L','Cold Room','No Frost','Aire homogéneo'],
+  ean:'7704353362503',
+  img:'https://drive.google.com/file/d/1yKdoh6AxXrfoqZu5dV63wMApHVVkzql4/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1pPpty84Ov_o2h7zwYzkFHdhJ8podyCI2/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera WHIRLPOOL No Frost Congelador Superior 435 Litros WRW45AKTWW Gris',
+  desc:'Nevera Whirlpool de 435L con tecnología Xpert Flow, dispensador de agua de 4L, panel touch electrónico y superficie Anti Fingerprint resistente a huellas. Sistema No Frost, iluminación LED, cajón con control de humedad y gran capacidad para familias numerosas.',
+  specs:['435L Total','Xpert Flow','Dispensador 4L','Panel Touch','Anti Fingerprint','No Frost · LED'],
+  ean:'7704353362589',
+  img:'https://drive.google.com/file/d/1HrWw8wbCXaN1lOjrTjY9P7a7972kGIkb/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1wDrY6GZ3zXyFvrgLk8zKELu7FJXPTu3W/view?usp=drive_link'},
+ {cat:'neveras',marca:'Whirlpool',nombre:'Nevera Whirlpool No Frost Congelador Superior 435 Litros Gris, Xpert flow',
+  desc:'Nevera Whirlpool de 435L con tecnología Xpert Flow para aire homogéneo y frescura prolongada. Dispensador de agua de 4L, sistema No Frost, cajón con control de humedad para frutas y verduras, iluminación LED y diseño funcional en gris.',
+  specs:['435L Total','Xpert Flow','Dispensador 4L','No Frost','Cajón control humedad','LED'],
+  ean:'7704353362541',
+  img:'https://drive.google.com/file/d/1conCsB5M_-Hnfz3846FAmTZ4XO9CDIsl/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1jd-1En-zO2NEEZfXjvW4OBWoZYdMXWHm/view?usp=drive_link'},
+ /* ===== KALLEY NEVERAS ===== */
+ {cat:'neveras',marca:'Kalley',nombre:'Nevera KALLEY Frost Una Puerta 187 Litros K-N187L Gris',
+  desc:'Nevera Kalley de 187L de una sola puerta con sistema Frost convencional y descongelamiento manual. Compacta y eficiente, ideal para espacios reducidos, cocinas y habitaciones. Estantes ajustables de vidrio, luz LED interior y control de temperatura por perilla.',
+  specs:['187L Total','Una Puerta','Frost · Manual','Estantes ajustables','Luz LED','Gris'],
+  ean:'7705946474863',
+  img:'https://drive.google.com/file/d/1vTQQY7G4qPgrLAGE9tJqQBUsLF-NBaDL/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/122wa4y4hSQGtCsl8NB-0M2sjG9kCEQXb/view?usp=drive_link'},
+ {cat:'neveras',marca:'Kalley',nombre:'Nevera KALLEY No Frost Congelador Superior 245 Litros INVERTER K-NT245L Gris',
+  desc:'Nevera Kalley de 245L con congelador superior y tecnología No Frost que evita la escarcha. Motor Inverter que ahorra energía y opera en silencio, iluminación LED de gran alcance, cajón para frutas y verduras con control de humedad y amplio espacio interior.',
+  specs:['245L Total','No Frost','Inverter · Silencioso','Congelador Superior','Luz LED','Gris'],
+  ean:'7705946476843',
+  img:'https://drive.google.com/file/d/1ED6G6SQmAzQP28Ap_P9U-wPii0uzrwRZ/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1ipzdjus8NK7lHC2C8NE6QsarNkQzm895/view?usp=drive_link'},
+ {cat:'neveras',marca:'Kalley',nombre:'Nevera KALLEY No Frost Congelador Superior 332 Litros Inverter K-NT332L Gris',
+  desc:'Nevera Kalley de 332L con congelador superior, tecnología No Frost sin escarcha y motor Inverter eficiente y silencioso. Mayor capacidad para familias, iluminación LED, cajón con control de humedad para frutas y verduras y estantes de vidrio templado.',
+  specs:['332L Total','No Frost','Inverter','Congelador Superior','Luz LED','Gris'],
+  ean:'7705946479066',
+  img:'https://drive.google.com/file/d/1LDgUSqncgsJgPstAHxGbi3XOLga77Y-B/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1dhkR0ijZFJlfUs6yXkzlmq4IhqdfXJMW/view?usp=drive_link'},
+ /* ===== NEVECONES KALLEY ===== */
+ {cat:'nevecones',marca:'Kalley',nombre:'Nevecón No Frost KALLEY French Door 362L',
+  desc:'Nevecón Kalley de 362L con 4 puertas tipo europeo (French Door), diseño premium y acabados elegantes. Sistema No Frost que evita la escarcha, amplio espacio interior organizado, iluminación LED y tecnología de enfriamiento uniforme. Perfecto para familias exigentes.',
+  specs:['362L Total','French Door 4 puertas','No Frost','Iluminación LED','Acabados premium','Tipo Europeo'],
+  ean:'7705946478014',
+  img:'https://drive.google.com/file/d/11Y1ZXUnB2Tek0deEcRB46yCqdd-Aqh0Y/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1gVxtsbcNehH3Cu9UOC2FEvWBW47g7APB/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Kalley',nombre:'Nevecón No Frost KALLEY Side by Side 529L',
+  desc:'Nevecón Kalley de 529L con 2 puertas Side by Side (lado a lado), gran capacidad para familias numerosas. Sistema No Frost, dispensador de agua y hielo en la puerta, iluminación LED interior y motor eficiente. Diseño moderno en gris.',
+  specs:['529L Total','Side by Side 2 puertas','No Frost','Dispensador agua/hielo','Iluminación LED','Gran capacidad'],
+  ean:'7705946478021',
+  img:'https://drive.google.com/file/d/14ykf0T1QDPLT8Gz8i2av01VOXfisjfzN/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Us4fF0QzdIFUyMSdhqdGvk4FCUFouL8J/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Kalley',nombre:'Nevecón KALLEY Side by Side 439L K-N439L2 Gris',
+  desc:'Nevecón Kalley de 439L con 2 puertas Side by Side, capacidad media-alta ideal para familias. Sistema No Frost sin escarcha, iluminación LED interior, estantes ajustables y cajones con control de humedad. Diseño compacto pero espacioso en gris moderno.',
+  specs:['439L Total','Side by Side 2 puertas','No Frost','Iluminación LED','Estantes ajustables','Gris'],
+  ean:'7705946480390',
+  img:'https://drive.google.com/file/d/12bAMpcBgPWuYOoIozmto9VtxhE8hjYSp/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1yphPPraGRmuNPdANJbGRxbwhu00sZPvQ/view?usp=drive_link'},
+ /* ===== NEVECONES WHIRLPOOL ===== */
+ {cat:'nevecones',marca:'Whirlpool',nombre:'Nevecón Whirlpool 518L Tipo Americano Side by Side',
+  desc:'Nevecón Whirlpool de 518L con diseño tipo americano Side by Side, tecnología Xpert Flow para aire homogéneo en toda la nevera. Sistema No Frost, dispensador de agua y hielo, Cold Room para carnes y lácteos, iluminación LED y gran capacidad familiar.',
+  specs:['518L Total','Side by Side Americano','Xpert Flow','Dispensador agua/hielo','Cold Room','No Frost'],
+  ean:'7501545587139',
+  img:'https://drive.google.com/file/d/1X--I2wJkaVIYw9N2wIPtCWPtaO_tA7Rd/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1JZ0G3by-q-q2KEbEyw03quyhD35tQwcw/view?usp=drive_link'},
+ /* ===== NEVECONES HACEB ===== */
+ {cat:'nevecones',marca:'Haceb',nombre:'Nevecón HACEB Side by Side 441L Manija Integrada Inverter Negro',
+  desc:'Nevecón Haceb de 441L con 2 puertas Side by Side, manija integrada elegante y panel digital táctil. Motor Inverter eficiente y silencioso con 10 años de garantía, sistema No Frost, dispensador de agua, iluminación LED y tecnología de enfriamiento uniforme.',
+  specs:['441L Total','Side by Side 2 puertas','Inverter 10 años','Panel digital táctil','Dispensador agua','No Frost · LED'],
+  ean:'7704353484922',
+  img:'https://drive.google.com/file/d/1Z14sd2AO9sfiopffYj2Si8rJUEcws6yq/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1EwFNZzV1k3Z5Bcm5ggr1DrjzU2sEwM2S/view?usp=drive_link'},
+ /* ===== NEVECONES SAMSUNG ===== */
+ {cat:'nevecones',marca:'Samsung',nombre:'Nevecón Samsung Side by Side 669L Plata RS23T5B00S9',
+  desc:'Nevecón Samsung de 669L brutos con diseño Side by Side en plata elegante. Tecnología Twin Cooling Plus que mantiene el aire frío y seco en el refrigerador y húmedo en el congelador, sistema No Frost, Digital Inverter eficiente y dispensador de agua/hielo exterior.',
+  specs:['669L Brutos','Side by Side','Twin Cooling Plus','Digital Inverter','Dispensador agua/hielo','No Frost'],
+  ean:'8806092121096',
+  img:'https://drive.google.com/file/d/1NvY64ZQGDuZgxW6e7b-E8TmwNyRHYrAH/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1phbvtlEpih9YT-PMLr3yv84rSLLU6qHU/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Samsung',nombre:'Nevecón SAMSUNG Tipo Europeo 625L RF22A4220SG Negro',
+  desc:'Nevecón Samsung de 625L brutos con diseño tipo europeo (3 puertas), acabados en negro premium. Tecnología SpaceMax™ que optimiza el espacio interior, All Around Cooling para distribución uniforme del frío, Digital Inverter eficiente y panel digital interno.',
+  specs:['625L Brutos','Tipo Europeo 3 puertas','SpaceMax™','All Around Cooling','Digital Inverter','Panel digital'],
+  ean:'8806092512443',
+  img:'https://drive.google.com/file/d/1XS3FneocEfpeMTthnRz4kTnqP6A0sjN_/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Fxo1zh5Ls01cAxE2803IksfWMR24gpCf/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Samsung',nombre:'Nevecón RS23CB70NA12 Bespoke Side by Side 640L',
+  desc:'Nevecón Samsung Bespoke de 640L con diseño personalizable y acabados premium. Tecnología SpaceMax™, All Around Cooling, Digital Inverter con 20 años de garantía en el compresor, dispensador de agua/hielo y conectividad WiFi con SmartThings para control desde el celular.',
+  specs:['640L Total','Bespoke personalizable','SpaceMax™','Digital Inverter 20 años','SmartThings WiFi','Dispensador agua/hielo'],
+  ean:'8806094927184',
+  img:'https://drive.google.com/file/d/1wML2ZFiGILRmdUP9Z0JgYjI885pcOXF6/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Mwo-Z8bEAhhJWkzfZxFavoPC8AieE6xH/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Samsung',nombre:'Nevecón SAMSUNG Side by Side 628L RS22T5200B1 Grafito',
+  desc:'Nevecón Samsung de 628L con diseño Side by Side en grafito elegante. Tecnología All Around Cooling que distribuye el frío uniformemente, Digital Inverter eficiente, Twin Cooling Plus para mantener frescura óptima y dispensador de agua/hielo exterior.',
+  specs:['628L Total','Side by Side','All Around Cooling','Twin Cooling Plus','Digital Inverter','Dispensador agua/hielo'],
+  ean:'8806092234468',
+  img:'https://drive.google.com/file/d/1ray5hXFq2DULmSTDxDFnkkftPn-L04LU/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1AmJDDbC-CWZBBcnqBT8iveOhEJKfyd9N/view?usp=drive_link'},
+ /* ===== NEVECONES ELECTROLUX ===== */
+ {cat:'nevecones',marca:'Electrolux',nombre:'Nevecón ELECTROLUX Side by Side 423L ERS45F3C5EB Negro',
+  desc:'Nevecón Electrolux de 423L con diseño Side by Side en negro elegante. Tecnología Inverter que ahorra hasta 40% de energía, sistema No Frost, dispensador de agua exterior, iluminación LED interior y cajones con control de humedad para frutas y verduras.',
+  specs:['423L Total','Side by Side','Inverter 40% ahorro','No Frost','Dispensador agua','LED'],
+  ean:'7909569483831',
+  img:'https://drive.google.com/file/d/1H_LE-vjZVx3XMPGkU1xmiYPEm-O0uXN7/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1nM7-W6DrvuVCySIb40CYdCC_EI2suxz0/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Electrolux',nombre:'Nevecón ELECTROLUX Side by Side 431L ERS44F3C5BB Negro',
+  desc:'Nevecón Electrolux de 431L con diseño Side by Side en negro, capacidad media-alta. Tecnología Inverter eficiente, sistema No Frost sin escarcha, iluminación LED, dispensador de agua exterior y estantes de vidrio templado resistente.',
+  specs:['431L Total','Side by Side','Inverter','No Frost','Dispensador agua','Vidrio templado'],
+  ean:'7909569491812',
+  img:'https://drive.google.com/file/d/1HOQ-PAXu7_PiDt1QK13ny2Z9Rgxke88v/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1sKY4_Crb-6nCyhYbt5VBKv1cGwUZ1Yta/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Electrolux',nombre:'Nevecón ELECTROLUX Side by Side 522L ERS53F3C5CI Gris',
+  desc:'Nevecón Electrolux de 522L con diseño Side by Side en gris moderno, gran capacidad para familias numerosas. Tecnología Inverter con ahorro energético, sistema No Frost, dispensador de agua/hielo exterior, iluminación LED y cajones con control de humedad.',
+  specs:['522L Total','Side by Side','Inverter','No Frost','Dispensador agua/hielo','Gran capacidad'],
+  ean:'7909569492277',
+  img:'https://drive.google.com/file/d/1iWz-hkAjxoKlOBInp1YV8_PM6oNfR_ue/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Dva_u-4YUiR_-gJJWxqOu5_PvpjgScDW/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Electrolux',nombre:'Nevecón ELECTROLUX Side by Side 522L ERS53F3C5CB Negro',
+  desc:'Nevecón Electrolux de 522L con diseño Side by Side en negro elegante, variante del modelo gris. Tecnología Inverter eficiente, sistema No Frost, dispensador de agua/hielo exterior, iluminación LED interior y acabados premium.',
+  specs:['522L Total','Side by Side','Inverter','No Frost','Dispensador agua/hielo','Negro elegante'],
+  ean:'7909569492284',
+  img:'https://drive.google.com/file/d/1EEhwc32vovODS0w1cAkIl8X_dSPzOk5e/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1hjjrnrD6eQ_qsJjkUuyWwUbYQH5ebVXi/view?usp=drive_link'},
+ {cat:'nevecones',marca:'Electrolux',nombre:'Nevecón Electrolux No Frost 530L Inverter ERSA53V3HVG Gris',
+  desc:'Nevecón Electrolux de 530L con tecnología Inverter avanzada y AutoSense que ajusta automáticamente la temperatura, ahorrando hasta 35% de energía. Sistema No Frost, dispensador de agua/hielo, iluminación LED interior y cajones Fresh Zone para frutas y verduras.',
+  specs:['530L Total','Inverter + AutoSense','No Frost','Dispensador agua/hielo','Fresh Zone','Ahorro 35%'],
+  ean:'7909569417249',
+  img:'https://drive.google.com/file/d/1clIH6YnjHDldoH2KlciOjMzA5p-M6oAo/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/14vFwMlHNe-JZuV-5nvbxrAeUvK2-ZwlR/view?usp=drive_link'},
+ /* ===== NEVECONES LG ===== */
+ {cat:'nevecones',marca:'LG',nombre:'Nevecón LG Side by Side 519L Brutos GS51BPP Gris',
+  desc:'Nevecón LG de 519L brutos con diseño Side by Side en gris mate. Tecnología LinearCooling™ que reduce fluctuaciones de temperatura, Multi Air Flow para distribución uniforme del aire, compresor Smart Inverter con 10 años de garantía y dispensador de agua exterior.',
+  specs:['519L Brutos','Side by Side','LinearCooling™','Multi Air Flow','Smart Inverter 10 años','Dispensador agua'],
+  ean:'8806091920232',
+  img:'https://drive.google.com/file/d/1N6Hyh0srXfMyvAGUnNHRzfMKKIKzi5Z9/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1uKVhksyf_Y5suznyWwY78OeNhuCtQE9R/view?usp=drive_link'},
+ {cat:'nevecones',marca:'LG',nombre:'Nevecón LG Tipo Europeo 618L LM22SGP Gris',
+  desc:'Nevecón LG de 618L con diseño tipo europeo (3 puertas), acabados en gris premium. Tecnología DoorCooling+™ que enfría más rápido desde la puerta, LinearCooling™ para temperatura constante, compresor Smart Inverter con 10 años de garantía y panel digital interno.',
+  specs:['618L Total','Tipo Europeo 3 puertas','DoorCooling+™','LinearCooling™','Smart Inverter 10 años','Panel digital'],
+  ean:'8806084072153',
+  img:'https://drive.google.com/file/d/1GF5eX4c7DnAuOpSqrWVnuk-jSPtOf_7r/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Brjwjtdnmbatxtki6mVDtV7VhuEDw2px/view?usp=drive_link'},
+ {cat:'nevecones',marca:'LG',nombre:'Nevecón LG Side by Side 637L GS66SPP Gris',
+  desc:'Nevecón LG de 637L con diseño Side by Side en gris elegante, gran capacidad para familias numerosas. Tecnología LinearCooling™, Multi Air Flow, compresor Smart Inverter con 10 años de garantía, dispensador de agua/hielo exterior y cajón Moist Balance Crisper.',
+  specs:['637L Total','Side by Side','LinearCooling™','Multi Air Flow','Smart Inverter 10 años','Moist Balance Crisper'],
+  ean:'8806091433084',
+  img:'https://drive.google.com/file/d/1joxMN3nIdN_NWu7Jqlh8WHwYyCapISP_/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/10ynZzduY72cmTZrLtZBarQ-NQ_gtmbdR/view?usp=drive_link'},
+ {cat:'nevecones',marca:'LG',nombre:'Nevecón LG InstaView Side by Side 635L GS66GPY Gris',
+  desc:'Nevecón LG de 635L con tecnología InstaView™ (toc-toc para ver el interior sin abrir), diseño Side by Side en gris premium. LinearCooling™, DoorCooling+™, compresor Smart Inverter con 10 años de garantía, dispensador de agua/hielo y conectividad WiFi con ThinQ.',
+  specs:['635L Total','InstaView™ Toc-Toc','Side by Side','LinearCooling™ · DoorCooling+™','Smart Inverter 10 años','ThinQ WiFi'],
+  ean:'8806096202159',
+  img:'https://drive.google.com/file/d/18I0odUJ4nafravTy21bc1n5tZrSgLMGP/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1qqOsYBH82n0afEO7evtj5eiTM2uSNUiH/view?usp=drive_link'},
+ {cat:'nevecones',marca:'LG',nombre:'Nevecón LG InstaView Side by Side 637L LS66SGP Gris',
+  desc:'Nevecón LG de 637L con tecnología InstaView™ (toca dos veces y mira el interior), diseño Side by Side en gris elegante. LinearCooling™, DoorCooling+™, compresor Smart Inverter con 10 años de garantía, dispensador de agua/hielo y panel digital táctil.',
+  specs:['637L Total','InstaView™','Side by Side','LinearCooling™ · DoorCooling+™','Smart Inverter 10 años','Panel táctil'],
+  ean:'8806091641359',
+  img:'https://drive.google.com/file/d/1XXNB7y_7KTdNd3FGR0ThrDi_BLLB3oii/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1vQmgkfH9KBpgEYY56t3C2VhPmXiOkEmT/view?usp=drive_link'},
+ {cat:'nevecones',marca:'LG',nombre:'Nevecón LG Side by Side 638L GS66SPY Gris LinearCooling',
+  desc:'Nevecón LG de 638L con diseño Side by Side en gris, la capacidad más grande de la línea. Tecnología LinearCooling™ para frescura prolongada, Multi Air Flow, compresor Smart Inverter con 10 años de garantía, dispensador de agua/hielo y cajón Moist Balance Crisper.',
+  specs:['638L Total','Side by Side','LinearCooling™','Multi Air Flow','Smart Inverter 10 años','Moist Balance Crisper'],
+  ean:'8806096060827',
+  img:'https://drive.google.com/file/d/1ak5mrTx_nKIzStCAm_o956BMyQSk2sLF/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1laN9VQZ6yAP3luhxeU2UnVl1fNreE8cF/view?usp=drive_link'},
+ /* ===== KALLEY LAVADORAS ===== */
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora Semiautomática Kalley K-LAVS5B 5 kg / 11 lbs',
+  desc:'Lavadora semiautomática Kalley de 5 kg (11 lbs) con doble tina: lava en una y centrifuga en la otra. Compacta, liviana y de muy bajo consumo, ideal para espacios pequeños, viajes o como segunda lavadora. Perillas de fácil manejo y ciclos rápidos.',
+  specs:['5 kg / 11 lbs','Semiautomática','Doble tina','Compacta y liviana','Bajo consumo'],
+  ean:'7705946201926',
+  img:'https://drive.google.com/file/d/17pb24Ndhz4sTEeeeYpwyvwicYfWn96GM/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1gjGWwU8IC3lKbAhZVVsEmtFDiyDI1UEO/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora Semiautomática Kalley K-LAVSA7B 7 kg / 15 lbs',
+  desc:'Lavadora semiautomática Kalley de 7 kg (15 lbs) con doble tina para lavar y centrifugar al tiempo. Mayor capacidad para la ropa de la semana, bajo consumo de agua y energía, perillas sencillas y diseño compacto que cabe en cualquier patio o zona de ropas.',
+  specs:['7 kg / 15 lbs','Semiautomática','Doble tina','Bajo consumo','Compacta'],
+  ean:'7705946374064',
+  img:'https://drive.google.com/file/d/19RQ9zlyS20jRh3uf0f-v5tS_p1W4uPOL/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1351w0It-Kei1WpncNSC8rHsfR5G19C-E/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Semiautomática Carga Superior 10,1 kg K-LDT10B1 Blanca',
+  desc:'Lavadora Kalley semiautomática de carga superior de 10,1 kg en color blanco. Doble tina con centrifugado eficiente, perillas de fácil manejo y bajo consumo. Perfecta para hogares medianos que buscan sencillez y economía.',
+  specs:['10,1 kg','Semiautomática','Carga superior','Blanca','Doble tina'],
+  ean:'7705946478779',
+  img:'https://drive.google.com/file/d/1bFqMzc05kTFiShAYny4QCT2xbxNRXILO/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1s9cZaEm3QeYlPwpxZp_0vp8YNGWbgBNe/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Semiautomática Carga Superior 13 kg K-LDT13K Blanca',
+  desc:'Lavadora Kalley semiautomática de carga superior de 13 kg en blanco. Capacidad para cargas grandes de ropa, doble tina con centrifugado potente, operación sencilla con perillas y bajo consumo de energía. Ideal para familias medianas y grandes.',
+  specs:['13 kg','Semiautomática','Carga superior','Blanca','Doble tina'],
+  ean:'7705946478762',
+  img:'https://drive.google.com/file/d/1nYQqdvthXfb9BlOdn1GROzRQKouj7uxd/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1IejZYvj3h84a_UnBj4mCwVO1a4t4TXbO/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Carga Superior 12 kg K-LD12GE Gris',
+  desc:'Lavadora Kalley automática de carga superior de 12 kg en color gris. Programas de lavado automáticos, panel de fácil manejo, cuidado de la ropa y ahorro de agua y energía. El tamaño justo para familias medianas.',
+  specs:['12 kg','Automática','Carga superior','Gris','Panel fácil manejo'],
+  ean:'7705946478724',
+  img:'https://drive.google.com/file/d/13TD1hTkUIM61PXpPRQzZNJcALoLVPj-M/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1UsFj2mgheQ3TJP7-_Q2aZONz3h6R0pEO/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Carga Superior 14 kg K-LD14GE Gris',
+  desc:'Lavadora Kalley automática de carga superior de 14 kg en gris. Programas automáticos para distintos tipos de tela, panel de fácil manejo, ahorro de agua y energía y diseño moderno. Capacidad ideal para familias grandes.',
+  specs:['14 kg','Automática','Carga superior','Gris','Programas automáticos'],
+  ean:'7705946478731',
+  img:'https://drive.google.com/file/d/16uXPxAejSyvCxjqldilPVm0Z1XQCtsRx/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1NpSQ3p8_Snym1V9gyWRMpHlDKluCppgl/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Carga Superior 16 kg K-LD16GE Gris',
+  desc:'Lavadora Kalley automática de carga superior de 16 kg en gris. Gran capacidad para cobijas y cargas pesadas, programas automáticos, panel de fácil manejo y ahorro de agua y energía. Perfecta para familias numerosas.',
+  specs:['16 kg','Automática','Carga superior','Gris','Gran capacidad'],
+  ean:'7705946478748',
+  img:'https://drive.google.com/file/d/1izJxU-9wE0r820XP14DrBUKu_MV_Jn9z/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1dA0f6SdcAGWUq9nYQSCrrIHf4ycqMXYG/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Carga Superior 18 kg K-LD18G Gris',
+  desc:'Lavadora Kalley automática de carga superior de 18 kg en gris. Capacidad de sobra para la ropa de toda la semana, programas automáticos, panel de fácil manejo y ahorro de agua y energía. Una aliada para familias grandes y negocios.',
+  specs:['18 kg','Automática','Carga superior','Gris','Gran capacidad'],
+  ean:'7705946474276',
+  img:'https://drive.google.com/file/d/11m57nxlxHNMJEdRiZqlv-PMsx4DbDms4/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Ee_tyS6EyPf47x8NkigMDDrCrnG1MdBy/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Carga Superior 18 kg K-LD18B2 Blanca',
+  desc:'Lavadora Kalley automática de carga superior de 18 kg en color blanco. La misma gran capacidad del modelo gris con estética blanca clásica: programas automáticos, panel de fácil manejo y ahorro de agua y energía.',
+  specs:['18 kg','Automática','Carga superior','Blanca','Gran capacidad'],
+  ean:'7705946474283',
+  img:'https://drive.google.com/file/d/10bRwiFuSVL9_3Yo_EwOQGR5gJA3LHZ7H/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1SYIzHG3xU17fljt4QROZSbS79r79TE28/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora KALLEY Carga Superior 22 kg K-LD22G Gris',
+  desc:'La lavadora más grande de Kalley: 22 kg de carga superior en gris. Capacidad para cobijas pesadas, edredones y cargas de negocio. Programas automáticos, panel de fácil manejo y ahorro de agua y energía. La reina de la zona de ropas.',
+  specs:['22 kg','Automática','Carga superior','Gris','Capacidad máxima'],
+  ean:'7705946480482',
+  img:'https://drive.google.com/file/d/1WK46A-0FaJmrbigjL91qXaYx28_W9mH4/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1tvrKO8DPxBJDdXZ3hRuAsxtOdSD16aPs/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Kalley',nombre:'Lavadora/Secadora KALLEY Carga Frontal 15 kg K-LS15 Plateado',
+  desc:'Lavadora y secadora Kalley de carga frontal de 15 kg en plateado: lava y seca en un solo equipo, ahorrando espacio. Diseño moderno con puerta frontal, programas automáticos y cuidado de las telas. Ideal para apartamentos y hogares sin patio.',
+  specs:['15 kg','Carga frontal','Lavadora + Secadora','Plateada','Programas automáticos'],
+  ean:'7705946479547',
+  img:'https://drive.google.com/file/d/1zGPfWvFXdh4IlTODmq12UfAF34WbFexv/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1M6OEeN-VG0lmfHmhKq4RnB0rwZZzKJ2f/view?usp=drive_link'},
+ /* ===== ELECTROLUX LAVADORAS ===== */
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora Semiautomática Westinghouse 7 kg (15 lb) WWTB07M6MUWW',
+  desc:'Lavadora semiautomática White Westinghouse (marca del grupo Electrolux) de 7 kg (15 lbs) con doble tina y carga superior. Sencilla, durable y de bajo consumo: lava y centrifuga al tiempo. Ideal para espacios pequeños y presupuestos ajustados.',
+  specs:['7 kg / 15 lbs','Semiautomática','Doble tina','Carga superior','Bajo consumo'],
+  ean:'7861106359866',
+  img:'https://drive.google.com/file/d/12o-IkEUkrIC9W0lDYQtFL0M41ZNIYDi0/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1YZNbrZM-SvslXW24qx9vDw5mNWFxlM7r/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora Semiautomática Frigidaire 9 kg (20 lb) FWTM09M6BUXW',
+  desc:'Lavadora semiautomática Frigidaire (grupo Electrolux) de 9 kg (20 lbs) con doble tina y carga superior. Capacidad para cargas medianas, centrifugado eficiente, operación sencilla con perillas y bajo consumo de agua y energía.',
+  specs:['9 kg / 20 lbs','Semiautomática','Doble tina','Carga superior','Bajo consumo'],
+  ean:'7861106353079',
+  img:'https://drive.google.com/file/d/1BqdAotqLbPjonwt5Hl1Tntuvh2LpRtmg/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1Jv9Q81GpSD3LODEMvnYmpX02l-JGK7mu/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora Semiautomática Frigidaire 12 kg FWTM12M6',
+  desc:'Lavadora semiautomática Frigidaire (grupo Electrolux) de 12 kg con doble tina y carga superior. Capacidad para cargas grandes, centrifugado potente, operación sencilla y bajo consumo. La semiautomática más capaz de la línea.',
+  specs:['12 kg','Semiautomática','Doble tina','Carga superior','Gran capacidad'],
+  ean:'7861106353086',
+  img:'https://drive.google.com/file/d/19ojiwJWC95IIs0RrFDYeuaQIhyfJA9HX/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1TondGboloVXpt6YgfLUTmKtO_XvQtLU4/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora Doble Tina White Westinghouse 14 kg WWTB14M6MUWW Blanca',
+  desc:'Lavadora semiautomática White Westinghouse de 14 kg con doble tina: lava y centrifuga al tiempo. Capacidad para cargas grandes, bajo consumo y operación sencilla con perillas. Una solución económica y durable para hogares exigentes.',
+  specs:['14 kg','Semiautomática','Doble tina','Blanca','Gran capacidad'],
+  ean:'7909569417249',
+  img:'https://drive.google.com/file/d/1IbuE9dRcgJr8Urf_fk0um6XMwN5eucO2/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1AROSKRRlhkgW16sPgAsLNI66r0JKdE47/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora ELECTROLUX Carga Superior 9,5 kg EWIW95F6USVG Gris',
+  desc:'Lavadora automática Electrolux de carga superior de 9,5 kg en gris. Programas inteligentes de lavado, cuidado de las telas, ahorro de agua y energía y panel de fácil manejo. Perfecta para familias pequeñas y medianas.',
+  specs:['9,5 kg','Automática','Carga superior','Gris','Panel fácil manejo'],
+  ean:'7861106359705',
+  img:'https://drive.google.com/file/d/1HQnDBP6JH0KzmaJyybwGFRCBOSqiF_wm/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1PIt388XmIMzaIlQCeNSweYkiFGID_eAG/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora ELECTROLUX Premium Care 12 kg EWIW12F6USVS Gris',
+  desc:'Lavadora automática Electrolux Premium Care de 12 kg en gris: carga superior con programas que cuidan las telas, ahorro de agua y energía, operación silenciosa y panel de fácil manejo. Capacidad ideal para familias medianas y grandes.',
+  specs:['12 kg','Automática · Premium Care','Carga superior','Gris','Cuidado de telas'],
+  ean:'7861106359729',
+  img:'https://drive.google.com/file/d/1HQnDBP6JH0KzmaJyybwGFRCBOSqiF_wm/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1PIt388XmIMzaIlQCeNSweYkiFGID_eAG/view?usp=drive_link'},
+ {cat:'lavadoras',marca:'Electrolux',nombre:'Lavadora ELECTROLUX Carga Superior 21 kg EWIX21F3ESB Negro',
+  desc:'La lavadora más grande de Electrolux: 21 kg de carga superior en negro elegante. Capacidad para cobijas, edredones y cargas de negocio, programas automáticos, panel moderno y ahorro de agua y energía. Potencia y estilo para familias numerosas.',
+  specs:['21 kg','Automática','Carga superior','Negra','Capacidad máxima'],
+  ean:'7861106359774',
+  img:'https://drive.google.com/file/d/13hMc86uwkAakBozHu7DTGIltF5I8hCC2/view?usp=drive_link',
+  img2:'https://drive.google.com/file/d/1zH87RE7DGwsBfb4zN5MniN8S8JUjvCAL/view?usp=drive_link'}
+];
+CATALOGO.forEach((p,i)=>{p.id='p'+i;});
+
+const MARCAS_TV=['Todos','Samsung','TCL','Kalley','LG'];
+const MARCAS_NEV=['Todas','Samsung','Haceb','Electrolux','Whirlpool','LG','Kalley'];
+const MARCAS_NVC=['Todas','Samsung','LG','Electrolux','Whirlpool','Haceb','Kalley'];
+const MARCAS_LAV=['Todas','Kalley','Electrolux','Samsung','Haceb','LG','Whirlpool'];
+
+const $=id=>document.getElementById(id);
+let lastCase=null;
+function go(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+setTimeout(()=>{$('typing').style.display='none';$('botMsg').style.display='block';},1600);
+function pronto(){toast('🛠️ Próximamente. Estamos armando esta categoría.');}
+let toastT=null;
+function toast(msg){
+  const t=$('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+function driveId(url){const m=String(url).match(/\/d\/([\w-]+)/);return m?m[1]:'';}
+function normImg(url){const id=driveId(url);return id?('https://lh3.googleusercontent.com/d/'+id):url;}
+function driveSrcs(id,sz){
+  sz=sz||'w1600';
+  return [
+    'https://lh3.googleusercontent.com/d/'+id,
+    'https://drive.google.com/thumbnail?id='+id+'&sz='+sz,
+    'https://drive.google.com/uc?export=view&id='+id
+  ];
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function imgFail(el){
+  let alts=[];try{alts=JSON.parse(el.getAttribute('data-alts')||'[]');}catch(e){}
+  if(alts.length){el.setAttribute('data-alts',JSON.stringify(alts.slice(1)));el.src=alts[0];return;}
+  el.style.display='none';
+  const b=el.getAttribute('data-banner');
+  if(b){const ban=$(b);if(ban)ban.style.display='grid';}
+}
+function imgFailThumb(el){
+  let alts=[];try{alts=JSON.parse(el.getAttribute('data-alts')||'[]');}catch(e){}
+  if(alts.length){el.setAttribute('data-alts',JSON.stringify(alts.slice(1)));el.src=alts[0];return;}
+  el.style.display='none';
+}
+function mediaHTML(p){
+  const id1=p.img?driveId(p.img):'';
+  const id2=p.img2?driveId(p.img2):'';
+  const bannerCls=p.ph==='mini'?'ph mini':'ph';
+  const bannerTxt=p.ph==='mini'?'Mini LED':p.marca;
+  let html='<div class="img-wrap">';
+  if(id1){
+    const s=driveSrcs(id1);
+    html+=`<img src="${s[0]}" alt="${esc(p.nombre)}" class="img-main" id="main-${p.id}" loading="lazy" data-alts='${JSON.stringify(s.slice(1))}' data-banner="ban-${p.id}" onerror="imgFail(this)">`;
+    html+=`<div class="${bannerCls}" id="ban-${p.id}" style="display:none"><b>${bannerTxt}</b></div>`;
+  }else{
+    html+=`<div class="${bannerCls}" id="ban-${p.id}"><b>${bannerTxt}</b></div>`;
+  }
+  if(id2){
+    const s2=driveSrcs(id2,'w300');
+    html+=`<img src="${s2[0]}" alt="Interior" class="img-thumb" id="thumb-${p.id}" loading="lazy" data-alts='${JSON.stringify(s2.slice(1))}' onerror="imgFailThumb(this)" onclick="swapImg('${p.id}')">`;
+  }
+  html+='</div>';
+  return html;
+}
+function swapImg(pid){
+  const main=$('main-'+pid),thumb=$('thumb-'+pid);
+  if(!main||!thumb)return;
+  const tS=main.src,tA=main.getAttribute('data-alts');
+  main.src=thumb.src;main.setAttribute('data-alts',thumb.getAttribute('data-alts')||'[]');
+  thumb.src=tS;thumb.setAttribute('data-alts',tA||'[]');
+  main.style.display='block';
+  const ban=$('ban-'+pid);if(ban)ban.style.display='none';
+}
+
+let CART=[];
+try{CART=JSON.parse(localStorage.getItem('cvCart')||'[]');}catch(e){CART=[];}
+CART=CART.map(i=>{
+  if(i.id&&CATALOGO.some(p=>p.id===i.id))return i;
+  const p=CATALOGO.find(x=>x.ean===i.ean);
+  return p?{id:p.id,qty:i.qty}:null;
+}).filter(Boolean);
+function saveCart(){localStorage.setItem('cvCart',JSON.stringify(CART));updateFab();}
+function updateFab(){
+  const n=CART.reduce((s,i)=>s+i.qty,0);
+  $('fabCnt').textContent=n;
+  if(n>0){$('fab').classList.add('bump');setTimeout(()=>$('fab').classList.remove('bump'),400);}
+}
+function addToCart(idx){
+  const p=CATALOGO[idx];
+  const it=CART.find(i=>i.id===p.id);
+  if(it)it.qty++;else CART.push({id:p.id,qty:1});
+  saveCart();
+  toast('✓ Agregado: '+p.nombre);
+}
+function changeQty(pid,d){
+  const it=CART.find(i=>i.id===pid);if(!it)return;
+  it.qty+=d;
+  if(it.qty<=0)CART=CART.filter(i=>i.id!==pid);
+  saveCart();renderCart();
+}
+function removeItem(pid){CART=CART.filter(i=>i.id!==pid);saveCart();renderCart();}
+function vaciarCart(){CART=[];saveCart();renderCart();toast('🗑️ Pedido vaciado');}
+function prodById(pid){return CATALOGO.find(p=>p.id===pid);}
+function openCart(){renderCart();go('v-cart');}
+function renderCart(){
+  if(!CART.length){
+    $('cartList').innerHTML=`<div class="empty">
+      <div class="empty-ico">🛒</div>
+      <h3>Tu pedido está vacío</h3>
+      <p>Toca el botón 🛒 para agregar productos del portafolio.</p>
+    </div>`;
+    $('btnSendCart').style.display='none';
+    return;
+  }
+  $('btnSendCart').style.display='block';
+  $('cartList').innerHTML=CART.map(i=>{
+    const p=prodById(i.id);if(!p)return '';
+    return `<div class="cart-item">
+      <img src="${normImg(p.img)}" alt="" onerror="this.style.visibility='hidden'">
+      <div class="ci-body">
+        <h4>${p.nombre}</h4>
+        <div class="ci-ean">EAN: ${p.ean}</div>
+        <div class="qty">
+          <button class="q-btn" onclick="changeQty('${p.id}',-1)" aria-label="Restar">−</button>
+          <span class="q-val">${i.qty}</span>
+          <button class="q-btn" onclick="changeQty('${p.id}',1)" aria-label="Sumar">+</button>
+        </div>
+      </div>
+      <button class="ci-x" onclick="removeItem('${p.id}')" aria-label="Quitar">✕</button>
+    </div>`;
+  }).join('');
+}
+function catIco(cat){return cat==='nevecones'?'❄️':(cat==='neveras'?'🧊':(cat==='lavadoras'?'🧺':'📺'));}
+function sendCart(){
+  if(!CART.length)return;
+  let txt='Hola Camilo 👋, quiero cotizar este pedido:\n';
+  CART.forEach(i=>{
+    const p=prodById(i.id);if(!p)return;
+    txt+=`\n${catIco(p.cat)} *${p.nombre}*\n🔢 EAN: ${p.ean} · Cant: ${i.qty}\n`;
+  });
+  txt+='\n¿Me colaboras con precios y disponibilidad?';
+  abrirWA(txt);
+  toast('📲 Pedido enviado por WhatsApp');
+}
+updateFab();
+
+function abrirCat(cat){
+  if(cat==='televisores'){renderChips('Todos','tv');renderTVs('Todos');go('v-tv');}
+  else if(cat==='neveras'){renderChips('Todas','nev');renderNevs('Todas');go('v-neveras');}
+  else if(cat==='nevecones'){renderChips('Todas','nvc');renderNvcs('Todas');go('v-nevecones');}
+  else if(cat==='lavadoras'){renderChips('Todas','lav');renderLavs('Todas');go('v-lav');}
+}
+function renderChips(marca,tipo){
+  const marcas=tipo==='tv'?MARCAS_TV:(tipo==='nev'?MARCAS_NEV:(tipo==='nvc'?MARCAS_NVC:MARCAS_LAV));
+  const gridId=tipo==='tv'?'chips':(tipo==='nev'?'chipsNev':(tipo==='nvc'?'chipsNvc':'chipsLav'));
+  const fn=tipo==='tv'?'TVs':(tipo==='nev'?'Nevs':(tipo==='nvc'?'Nvcs':'Lavs'));
+  $(gridId).innerHTML=marcas.map(m=>
+    `<button class="chip ${m===marca?'on':''}" onclick="renderChips('${m}','${tipo}');render${fn}('${m}')">${m}</button>`).join('');
+}
+function prodCard(p){
+  const idx=CATALOGO.indexOf(p);
+  const specs=p.specs?`<div class="specs">${p.specs.map(s=>`<span>${s}</span>`).join('')}</div>`:'';
+  return `<div class="prod">
+    <div class="prod-img">${mediaHTML(p)}<span class="brand">${p.marca}</span></div>
+    <div class="prod-body">
+      <h4>${p.nombre}</h4>
+      <p class="desc">${p.desc}</p>
+      ${specs}
+      <div class="ean">Código EAN: <b>${p.ean}</b></div>
+      <button class="btn btn-amber" onclick="addToCart(${idx})">🛒 Agregar al pedido</button>
+      <button class="btn btn-ghost" style="margin-top:.4rem" onclick="cotizarIdx(${idx})">💬 Cotizar solo este</button>
+    </div>
+  </div>`;
+}
+const emptyHTML=(msg)=>`<div class="empty"><div class="empty-ico">📦</div><h3>Sin modelos aún</h3><p>${msg}</p></div>`;
+function renderTVs(marca){
+  const lista=CATALOGO.filter(p=>p.cat==='televisores'&&(marca==='Todos'||p.marca===marca));
+  $('tvGrid').innerHTML=lista.map(prodCard).join('')||emptyHTML('Pronto llegarán más modelos de esta marca.');
+}
+function renderNevs(marca){
+  const lista=CATALOGO.filter(p=>p.cat==='neveras'&&(marca==='Todas'||p.marca===marca));
+  $('nevGrid').innerHTML=lista.map(prodCard).join('')||emptyHTML('Pronto llegarán más modelos de esta marca.');
+}
+function renderNvcs(marca){
+  const lista=CATALOGO.filter(p=>p.cat==='nevecones'&&(marca==='Todas'||p.marca===marca));
+  $('nvcGrid').innerHTML=lista.map(prodCard).join('')||emptyHTML('Pronto llegarán más modelos de esta marca.');
+}
+function renderLavs(marca){
+  const lista=CATALOGO.filter(p=>p.cat==='lavadoras'&&(marca==='Todas'||p.marca===marca));
+  $('lavGrid').innerHTML=lista.map(prodCard).join('')||emptyHTML('Camilo está cargando las lavadoras. ¡Muy pronto!');
+}
+function cotizarIdx(i){
+  const p=CATALOGO[i];
+  abrirWA(`Hola Camilo 👋, quiero cotizar:\n\n${catIco(p.cat)} *${p.nombre}*\n🔢 EAN: ${p.ean}`);
+}
+function noEncuentro(){ abrirWA('Hola Camilo 👋, busco un producto que no vi en el portafolio. Te cuento cuál: '); }
+function abrirWA(txt){
+  window.open('https://wa.me/'+TU_WHATSAPP+'?text='+encodeURIComponent(txt));
+}
+
+let gTipo='', files={serial:null,novedad:null,video:null};
+const FLUJOS={Preventa:[1,3,4,5],Postventa:[1,2,3,4,5]};
+let flujoActual=FLUJOS.Postventa, curStep=1;
+
+function startGarantias(){
+  gTipo='';
+  document.querySelectorAll('.tipo-card').forEach(c=>c.classList.remove('sel'));
+  flujoActual=FLUJOS.Postventa;
+  showStepByIndex(0);
+}
+function setTipo(t,el){
+  gTipo=t; flujoActual=FLUJOS[t];
+  document.querySelectorAll('.tipo-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); $('err-tipo').style.display='none'; saveDraft();
+}
+function showStepByIndex(idx){
+  curStep=flujoActual[idx];
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  const el=document.querySelector(`.step[data-step="${curStep}"]`);
+  if(el)el.classList.add('active');
+  const total=flujoActual.length;
+  $('progBar').style.width=((idx+1)/total*100)+'%';
+  $('stepTag').textContent=`Paso ${idx+1} de ${total}`;
+  $('btnBack').style.display=idx>0?'block':'none';
+  $('btnNext').textContent=(idx===total-1)?'📤 Radicar caso':'Siguiente →';
+  if(idx===total-1)buildSummary();
+  $('btnNext').dataset.idx=idx; $('btnBack').dataset.idx=idx;
+  saveDraft();
+}
+function nextStep(){
+  const idx=parseInt($('btnNext').dataset.idx||'0',10);
+  if(!validateStep(curStep))return;
+  if(idx===flujoActual.length-1){submitGar();return;}
+  showStepByIndex(idx+1);
+}
+function prevStep(){
+  const idx=parseInt($('btnBack').dataset.idx||'0',10);
+  if(idx>0)showStepByIndex(idx-1);
+}
+function markErr(inputId,errId,bad){
+  $(errId).style.display=bad?'block':'none';
+  if(inputId)$(inputId).classList.toggle('bad',bad);
+  return !bad;
+}
+function validateStep(step){
+  if(step===1){if(!gTipo){$('err-tipo').style.display='block';return false;}return true;}
+  if(step===2){
+    let ok=true;
+    ok=markErr('g-nombre','e-nombre',!$('g-nombre').value.trim())&&ok;
+    ok=markErr('g-cc','e-cc',!/^[0-9]{6,12}$/.test($('g-cc').value.trim()))&&ok;
+    ok=markErr('g-cel','e-cel',!/^3[0-9]{9}$/.test($('g-cel').value.trim()))&&ok;
+    ok=markErr(null,'e-mun-dir',!$('g-mun').value.trim()||!$('g-dir').value.trim())&&ok;
+    ok=markErr('g-mail','e-mail',!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test($('g-mail').value.trim()))&&ok;
+    return ok;
+  }
+  if(step===3){
+    let ok=true;
+    ok=markErr(null,'e-marca-serial',!$('g-marca').value.trim()||!$('g-serial').value.trim())&&ok;
+    ok=markErr('g-fecha','e-fecha',!$('g-fecha').value)&&ok;
+    ok=markErr('g-dano','e-dano',!$('g-dano').value)&&ok;
+    return ok;
+  }
+  if(step===4){
+    const ok=files.serial&&files.novedad&&files.video;
+    $('e-evid').style.display=ok?'none':'block';
+    return ok;
+  }
+  if(step===5){return markErr('g-nit','e-nit',!/^[0-9-]{6,15}$/.test($('g-nit').value.trim()));}
+  return true;
+}
+
+function wireImg(inputId,prevId,cardId,key){
+  $(inputId).addEventListener('change',e=>{
+    const f=e.target.files[0];if(!f)return;
+    if(f.size>5*1024*1024){alert('⚠️ La foto pesa mucho (más de 5 MB).');e.target.value='';return;}
+    files[key]=f;
+    const img=$(prevId);img.src=URL.createObjectURL(f);img.style.display='block';
+    $(cardId).classList.add('done');$(cardId).querySelector('.badge-ok').style.display='block';
+    $('e-evid').style.display='none';
+  });
+}
+wireImg('f-serial','p-serial','u1','serial');
+wireImg('f-novedad','p-novedad','u2','novedad');
+$('f-video').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(f.size>30*1024*1024){alert('⚠️ El video pesa más de 30 MB. Grábalo más corto.');e.target.value='';return;}
+  const v=document.createElement('video');v.preload='metadata';
+  const url=URL.createObjectURL(f);
+  v.onloadedmetadata=()=>{
+    const seg=Math.round(v.duration);URL.revokeObjectURL(url);
+    const badge=$('durBadge');
+    if(v.duration>20){alert(`⏱️ El video dura ${seg} segundos y el máximo son 20.`);e.target.value='';badge.style.display='none';return;}
+    files.video=f;
+    badge.textContent=`✓ Duración: ${seg} seg.`;badge.style.display='inline-block';
+    $('u3').classList.add('done');$('u3').querySelector('.badge-ok').style.display='block';
+    $('e-evid').style.display='none';
+  };
+  v.src=url;
+});
+$('g-fecha').max=new Date().toISOString().split('T')[0];
+
+function buildSummary(){
+  const r=[['Tipo de garantía',gTipo],['Marca',$('g-marca').value],['Serial',$('g-serial').value],
+  ['Fecha de compra',$('g-fecha').value],['Tipo de daño',$('g-dano').value],
+  ['Descripción',$('g-desc').value||'—'],['NIT Corbeta',$('g-nit').value],
+  ['Evidencias','Foto serial ✓ · Foto novedad ✓ · Video ✓']];
+  if(gTipo==='Postventa'){
+    r.splice(1,0,['Cliente final',$('g-nombre').value],['CC',$('g-cc').value],['Celular',$('g-cel').value],
+    ['Municipio',$('g-mun').value],['Dirección',$('g-dir').value],['Correo',$('g-mail').value]);
+  }
+  $('sumBox').innerHTML='<div class="sum-h">Resumen del caso</div>'+
+    r.map(([k,v])=>`<div class="sum-r"><b>${k}</b><span>${v}</span></div>`).join('');
+}
+function submitGar(){
+  const total=(files.serial.size+files.novedad.size+files.video.size)/1048576;
+  if(total>35){alert('⚠️ Las evidencias pesan '+total.toFixed(0)+' MB (máximo 35).');return;}
+  const caso={tipo:'GARANTÍA · '+gTipo,fecha:new Date().toLocaleString('es-CO'),
+    marca:$('g-marca').value,serial:$('g-serial').value,fechaCompra:$('g-fecha').value,
+    dano:$('g-dano').value,desc:$('g-desc').value,nit:$('g-nit').value};
+  if(gTipo==='Postventa'){
+    caso.nombre=$('g-nombre').value;caso.cc=$('g-cc').value;caso.cel=$('g-cel').value;
+    caso.municipio=$('g-mun').value;caso.direccion=$('g-dir').value;caso.correo=$('g-mail').value;
+  }
+  procesarCaso(caso,'¡Garantía radicada!');
+}
+
+function saveCase(d){
+  const casos=JSON.parse(localStorage.getItem('camiloCasos')||'[]');
+  d.codigo='CV-'+String(casos.length+1).padStart(4,'0');
+  casos.push(d);localStorage.setItem('camiloCasos',JSON.stringify(casos));
+  return d;
+}
+function updateCaseStorage(){
+  const casos=JSON.parse(localStorage.getItem('camiloCasos')||'[]');
+  const i=casos.findIndex(c=>c.codigo===lastCase.codigo);
+  if(i>-1){casos[i]=lastCase;localStorage.setItem('camiloCasos',JSON.stringify(casos));}
+}
+
+function fileToB64(f){return new Promise((res,rej)=>{const x=new FileReader();
+  x.onload=()=>res(x.result.split(',')[1]);x.onerror=rej;x.readAsDataURL(f);});}
+async function subirANube(caso){
+  const adjuntos=[];
+  if(files.serial)adjuntos.push({nombre:'foto_serial.jpg',mimeType:files.serial.type,base64:await fileToB64(files.serial)});
+  if(files.novedad)adjuntos.push({nombre:'foto_novedad.jpg',mimeType:files.novedad.type,base64:await fileToB64(files.novedad)});
+  if(files.video)adjuntos.push({nombre:'video_novedad.mp4',mimeType:files.video.type,base64:await fileToB64(files.video)});
+  const resp=await fetch(URL_NUBE,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({...caso,archivos:adjuntos})});
+  const text=await resp.text();
+  try{return JSON.parse(text);}catch(e){throw new Error('Respuesta no JSON: '+text.slice(0,150));}
+}
+async function procesarCaso(caso,titulo){
+  lastCase=saveCase(caso);
+  const btn=$('btnNext');
+  btn.textContent='📡 Enviando a la nube…';btn.disabled=true;
+  try{
+    const r=await subirANube(lastCase);
+    if(r&&r.ok){lastCase.nube=r.url;}else{lastCase.nube='pendiente';lastCase._err=(r&&r.error)||'desconocido';}
+  }catch(e){lastCase.nube='pendiente';lastCase._err=String(e.message||e);}
+  btn.disabled=false;btn.textContent='📤 Radicar caso';
+  updateCaseStorage();
+  $('okTitle').textContent=titulo;$('caseCode').textContent=lastCase.codigo;
+  refreshCloudStatus();go('v-ok');
+}
+async function reintentar(){
+  const btn=$('btnRetry');btn.disabled=true;btn.textContent='📡 Reintentando…';
+  try{
+    const r=await subirANube(lastCase);
+    if(r&&r.ok){lastCase.nube=r.url;delete lastCase._err;}else{lastCase.nube='pendiente';lastCase._err=(r&&r.error)||'desconocido';}
+  }catch(e){lastCase.nube='pendiente';lastCase._err=String(e.message||e);}
+  btn.disabled=false;btn.textContent='📡 Reintentar envío';
+  updateCaseStorage();refreshCloudStatus();
+}
+function refreshCloudStatus(){
+  if(lastCase.nube&&lastCase.nube!=='pendiente'){
+    $('cloudStatus').innerHTML='☁️ <b>Caso en la nube.</b> Camilo lo verá en su panel y en su correo.';
+    $('btnRetry').style.display='none';$('debugMsg').textContent='';
+  }else{
+    $('cloudStatus').innerHTML='📴 <b>Sin señal por ahora:</b> el caso quedó guardado en este dispositivo.';
+    $('btnRetry').style.display='block';
+    if(lastCase._err)$('debugMsg').textContent='Detalle: '+lastCase._err;
+  }
+}
+
+function sendWA(){
+  const c=lastCase;
+  let txt=`🤖 *CASO ${c.codigo} · CAMILO VIRTUAL*\n📌 ${c.tipo} · ${c.fecha}\n`;
+  if(c.tipo.startsWith('GARANTÍA')){
+    if(c.nombre){txt+=`\n👤 *Cliente final:* ${c.nombre} (CC ${c.cc})\n📱 ${c.cel} · ${c.municipio} · ${c.direccion}\n✉️ ${c.correo}\n`;}
+    txt+=`\n📟 *Producto:* ${c.marca} · Serial ${c.serial}\n🗓️ Compra: ${c.fechaCompra}\n⚠️ Daño: ${c.dano}${c.desc?'\n📝 '+c.desc:''}\n\n🏪 *NIT Corbeta:* ${c.nit}\n\n📎 Adjunto foto del serial, foto de la novedad y video (≤20s).`;
+  }else{
+    txt+=`\n👤 ${c.nombre} · 📱 ${c.cel}\n📍 ${c.municipio||'—'} · ${c.cat}\n📝 ${c.detalle}`;
+  }
+  abrirWA(txt);
+}
+
+function resetAll(){
+  ['g-nombre','g-cc','g-cel','g-mun','g-dir','g-mail','g-marca','g-serial','g-fecha','g-dano','g-desc','g-nit'].forEach(i=>$(i).value='');
+  gTipo='';files={serial:null,novedad:null,video:null};
+  document.querySelectorAll('.tipo-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.upload').forEach(u=>{u.classList.remove('done');const b=u.querySelector('.badge-ok');if(b)b.style.display='none';});
+  document.querySelectorAll('.preview').forEach(p=>{p.style.display='none';p.src='';});
+  $('durBadge').style.display='none';
+  ['f-serial','f-novedad','f-video'].forEach(i=>$(i).value='');
+  localStorage.removeItem('camiloDraft');
+  go('v-home');
+}
+
+const draftFields=['g-nombre','g-cc','g-cel','g-mun','g-dir','g-mail','g-marca','g-serial','g-fecha','g-dano','g-desc','g-nit'];
+draftFields.forEach(id=>$(id).addEventListener('input',saveDraft));
+function saveDraft(){
+  const d={tipo:gTipo};draftFields.forEach(id=>d[id]=$(id).value);
+  localStorage.setItem('camiloDraft',JSON.stringify(d));
+}
+(function loadDraft(){
+  const d=JSON.parse(localStorage.getItem('camiloDraft')||'null');if(!d)return;
+  draftFields.forEach(id=>{if(d[id])$(id).value=d[id];});
+})();
+</script>
+</body>
+</html>
